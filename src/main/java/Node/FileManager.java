@@ -1,4 +1,4 @@
-package FileTransfer;
+package Node;
 
 public class FileManager {
 }

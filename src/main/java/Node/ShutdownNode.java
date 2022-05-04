@@ -26,6 +26,7 @@ public class ShutdownNode extends Thread{
         this.shutdownSocket = new DatagramSocket(8002);
         this.shutdownSocket.setSoTimeout(1000);
         node.delete(currentID);
+
     }
     @Override
     public void start(){
