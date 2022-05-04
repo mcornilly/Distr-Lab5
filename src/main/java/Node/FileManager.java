@@ -42,7 +42,6 @@ public class FileManager extends Thread {
     public void run(){
         while(this.node.discoveryNode.getNode().getRunning()) {
             while(sendFiles) {
-                System.out.println("test");
                 if (!node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
                     assert this.localFiles != null;
@@ -53,7 +52,7 @@ public class FileManager extends Thread {
                             JSONParser parser = new JSONParser();
                             try {
                                 Object obj = parser.parse(fileLocation);
-                                int locationID = (int) ((JSONObject) obj).get("node ID");
+                                int locationID = (int) (long) ((JSONObject) obj).get("node ID");
                                 String locationIP = ((JSONObject) obj).get("node IP").toString();
                                 sendFile(f, locationIP);
                                 this.sharedFiles.put(f.getName(), locationIP);
