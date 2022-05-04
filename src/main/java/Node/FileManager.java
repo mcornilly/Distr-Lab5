@@ -30,7 +30,7 @@ public class FileManager extends Thread {
         this.node = node;
         this.sendFiles = true;
         this.receiving = false;
-        this.localFolder = new File("\\src\\main\\resources\\LocalFiles");
+        this.localFolder = new File("/src/main/resources/LocalFiles");
         this.replicatedFolder = new File("\\src\\main\\resources\\ReplicatedFiles\\");
         this.localFiles = this.localFolder.listFiles();
 
