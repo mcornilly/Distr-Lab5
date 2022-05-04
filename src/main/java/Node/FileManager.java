@@ -39,7 +39,7 @@ public class FileManager extends Thread {
     public void run(){
         //while(this.node.discoveryNode.getNode().getRunning()) {
             while(this.sendFiles) {
-                System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
                     for (File f : this.localFiles) {
