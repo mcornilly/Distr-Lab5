@@ -52,9 +52,12 @@ public class FileManager extends Thread {
                             try {
                                 Object obj = parser.parse(fileLocation);
                                 int locationID = (int) (long) ((JSONObject) obj).get("node ID");
+                                System.out.println("local" + InetAddress.getLocalHost().getHostAddress());
                                 String locationIP = ((JSONObject) obj).get("node IP").toString();
-                                sendFile(f, locationIP);
-                                this.sharedFiles.put(f.getName(), locationIP);
+                                if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) {
+                                    sendFile(f, locationIP);
+                                    this.sharedFiles.put(f.getName(), locationIP);
+                                }
                                 System.out.println("succes send");
                                 System.out.println(this.sharedFiles);
                             } catch (Exception e) {
