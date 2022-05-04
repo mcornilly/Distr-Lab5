@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class FileManager extends Thread {
@@ -38,24 +39,25 @@ public class FileManager extends Thread {
     public void run(){
         while(this.node.discoveryNode.getNode().getRunning() && !this.node.discoveryNode.isDiscoveryPhase()) {
             while(sendFiles){
-            assert this.localFiles != null;
-            for (File f : this.localFiles) {
-                String fileLocation = this.node.getFile(f.getName());
-                if (!fileLocation.equals("Error")) {
-                    JSONParser parser = new JSONParser();
-                    try {
-                        Object obj = parser.parse(fileLocation);
-                        int locationID = (int) ((JSONObject) obj).get("node ID");
-                        String locationIP = ((JSONObject) obj).get("node IP").toString();
-                        sendFile(f, locationIP);
-                        this.sharedFiles.put(f.getName(), locationIP);
-                        System.out.println("succes send");
-                        System.out.println(this.sharedFiles);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                System.out.println(Arrays.toString(this.localFiles));
+                assert this.localFiles != null;
+                for (File f : this.localFiles) {
+                    String fileLocation = this.node.getFile(f.getName());
+                    if (!fileLocation.equals("Error")) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            Object obj = parser.parse(fileLocation);
+                            int locationID = (int) ((JSONObject) obj).get("node ID");
+                            String locationIP = ((JSONObject) obj).get("node IP").toString();
+                            sendFile(f, locationIP);
+                            this.sharedFiles.put(f.getName(), locationIP);
+                            System.out.println("succes send");
+                            System.out.println(this.sharedFiles);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
                 this.sendFiles = false;
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
