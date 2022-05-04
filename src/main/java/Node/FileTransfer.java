@@ -1,38 +1,40 @@
+/*
 package Node;
 
 import Node.NamingNode;
 
 import java.io.*;
 import java.net.DatagramSocket;
+import java.net.Socket;
+import java.net.SocketException;
 
 public class FileTransfer {
 
-    private final DatagramSocket ClientSocket;
+    private final Socket sendingSocket;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private final NamingNode node;
     private final int currentID;
-    private final int nextID;
-    private final int previousID;
-    private final String previousIP;
-    private final String nextIP;
 
-    public FileTransfer(NamingNode node){
+    private String fileName;
+
+
+    public FileTransfer(NamingNode node, File file, String IP, int portNumber) throws Exception {
         this.node = node;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
-        this.nextID = node.discoveryNode.getNextID();
-        this.previousID = node.discoveryNode.getPreviousID();
-        this.nextIP = node.discoveryNode.getNextIP();
-        this.previousIP = node.discoveryNode.getPreviousIP();
-        this.ClientSocket = new DatagramSocket(8006);
-        this.ClientSocket.setSoTimeout(1000);
-        node.delete(currentID);
+        this.
+        this.sendingSocket = new Socket("localhost", portNumber);
+        this.fileName = fileName;
+        dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
+        dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
+        //sendFile("\\resources\\LocalFiles\\"+fileName);
     }
 
-    private static void receiveFile(String fileName) throws Exception{
+    private static void receiveFile(String path) throws Exception{
         int bytes = 0;
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+        String fileName = dataInputStream.readUTF();
+        FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
         long size = dataInputStream.readLong();     // read file size
         byte[] buffer = new byte[4*1024];
         while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
@@ -42,10 +44,13 @@ public class FileTransfer {
         fileOutputStream.close();
     }
 
-    private static void sendFile(String path) throws Exception{
+    private static void sendFile(String path, File file, String IP, int portNumber) throws Exception{
         int bytes = 0;
         File file = new File(path);
         FileInputStream fileInputStream = new FileInputStream(file);
+        file.getName();
+        dataOutputStream.writeUTF(file.getName());
+        dataOutputStream.flush();
         dataOutputStream.writeLong(file.length());
         byte[] buffer = new byte[4*1024];
         while ((bytes=fileInputStream.read(buffer))!=-1){
@@ -56,3 +61,4 @@ public class FileTransfer {
     }
 
 }
+*/

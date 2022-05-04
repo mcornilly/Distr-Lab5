@@ -30,14 +30,16 @@ public class NamingNode {
         this.discoveryNode.start();
 
     }
-    public void getFile(String filename) {
+    public String getFile(String filename) {
         try {
             //String URL = "http://localhost:8080/NamingServer/getFile/" + filename; //REST command
             String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Files/" + filename;
             System.out.println(Unirest.get(URL).asString().getBody());
+            return Unirest.get(URL).asString().getBody();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "Error";
     }
     public void getNode(String user) throws UnirestException, ParseException {
         //String URL = "http://localhost:8080/NamingServer/Nodes/" + user;
@@ -97,7 +99,7 @@ public class NamingNode {
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
         new PingNode(node).start();
-
+        new FileManager(node).start();
         Thread.sleep(120000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
         //node.newNode(name, IP);
