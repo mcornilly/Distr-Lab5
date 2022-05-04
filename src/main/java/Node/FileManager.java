@@ -40,7 +40,7 @@ public class FileManager extends Thread {
     }
 
     public void run(){
-        while(this.node.discoveryNode.getNode().getRunning()) {
+        //while(this.node.discoveryNode.getNode().getRunning()) {
             while(sendFiles) {
                 if (!node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
@@ -78,7 +78,7 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
         }
-    }
+    //}
     private static void receiveFile(String path) throws Exception{
         int bytes = 0;
         String fileName = dataInputStream.readUTF();
