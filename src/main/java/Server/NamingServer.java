@@ -76,7 +76,7 @@ public class NamingServer extends Thread{
         ipMapLock.readLock().unlock();
         //return "The file " + fileName + " is located at: " + entry.getValue() + " with ID: " + entry.getKey().toString() + "\n";
         return "{\"file\":" + "\"" + fileName + "\"" + "," + "\"node ID\":" + entry.getKey() + "," +
-                "\"node IP\":" + entry.getValue() + "}";
+                "\"node IP\":" + "\"" +  entry.getValue() + "\"" +  "}";
     }
     @GetMapping("/NamingServer/Nodes/{node}")
     public String getNodes(@PathVariable(value = "node") String name){
