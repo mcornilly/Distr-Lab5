@@ -41,7 +41,8 @@ public class FileManager extends Thread {
     public void run(){
         //while(this.node.discoveryNode.getNode().getRunning()) {
             while(this.sendFiles) {
-                if (!node.discoveryNode.isDiscoveryPhase()) {
+                System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                if (!this.node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
                     assert this.localFiles != null;
                     for (File f : this.localFiles) {
@@ -62,7 +63,7 @@ public class FileManager extends Thread {
                             }
                         }
                     }
-                    this.sendFiles = false;
+                    //this.sendFiles = false;
                 }
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
