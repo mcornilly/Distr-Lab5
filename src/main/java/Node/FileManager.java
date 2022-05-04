@@ -36,12 +36,11 @@ public class FileManager extends Thread {
         this.replicatedFolder = new File("\\src\\main\\resources\\ReplicatedFiles\\");
         this.localFiles = this.localFolder.listFiles();
         System.out.println(Arrays.toString(this.localFiles));
-
     }
 
     public void run(){
         //while(this.node.discoveryNode.getNode().getRunning()) {
-            while(sendFiles) {
+            while(this.sendFiles) {
                 if (!node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
                     assert this.localFiles != null;
