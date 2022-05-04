@@ -42,6 +42,7 @@ public class FileManager extends Thread {
     public void run(){
         while(this.node.discoveryNode.getNode().getRunning()) {
             while(sendFiles) {
+                System.out.println("test");
                 if (!node.discoveryNode.isDiscoveryPhase()) {
                     System.out.println(Arrays.toString(this.localFiles));
                     assert this.localFiles != null;
