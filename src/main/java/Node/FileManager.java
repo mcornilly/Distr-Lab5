@@ -73,7 +73,7 @@ public class FileManager extends Thread {
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
                 receiveFile(this.replicatedFolder.toString());
-                receivingSocket.close();
+                //receivingSocket.close();
             }
         } catch (Exception e){
             e.printStackTrace();
