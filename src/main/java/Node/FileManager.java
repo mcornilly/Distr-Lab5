@@ -45,6 +45,7 @@ public class FileManager extends Thread {
                 System.out.println(Arrays.toString(this.localFiles));
                 assert this.localFiles != null;
                 for (File f : this.localFiles) {
+                    System.out.println(f.getName());
                     String fileLocation = this.node.getFile(f.getName());
                     if (!fileLocation.equals("Error")) {
                         JSONParser parser = new JSONParser();
