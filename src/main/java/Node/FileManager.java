@@ -40,29 +40,31 @@ public class FileManager extends Thread {
     }
 
     public void run(){
-        while(this.node.discoveryNode.getNode().getRunning() && !this.node.discoveryNode.isDiscoveryPhase()) {
-            while(sendFiles){
-                System.out.println(Arrays.toString(this.localFiles));
-                assert this.localFiles != null;
-                for (File f : this.localFiles) {
-                    System.out.println(f.getName());
-                    String fileLocation = this.node.getFile(f.getName());
-                    if (!fileLocation.equals("Error")) {
-                        JSONParser parser = new JSONParser();
-                        try {
-                            Object obj = parser.parse(fileLocation);
-                            int locationID = (int) ((JSONObject) obj).get("node ID");
-                            String locationIP = ((JSONObject) obj).get("node IP").toString();
-                            sendFile(f, locationIP);
-                            this.sharedFiles.put(f.getName(), locationIP);
-                            System.out.println("succes send");
-                            System.out.println(this.sharedFiles);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+        while(this.node.discoveryNode.getNode().getRunning()) {
+            while(sendFiles) {
+                if (!node.discoveryNode.isDiscoveryPhase()) {
+                    System.out.println(Arrays.toString(this.localFiles));
+                    assert this.localFiles != null;
+                    for (File f : this.localFiles) {
+                        System.out.println(f.getName());
+                        String fileLocation = this.node.getFile(f.getName());
+                        if (!fileLocation.equals("Error")) {
+                            JSONParser parser = new JSONParser();
+                            try {
+                                Object obj = parser.parse(fileLocation);
+                                int locationID = (int) ((JSONObject) obj).get("node ID");
+                                String locationIP = ((JSONObject) obj).get("node IP").toString();
+                                sendFile(f, locationIP);
+                                this.sharedFiles.put(f.getName(), locationIP);
+                                System.out.println("succes send");
+                                System.out.println(this.sharedFiles);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                    this.sendFiles = false;
                 }
-                this.sendFiles = false;
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
             while(this.receiving) {
