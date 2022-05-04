@@ -18,7 +18,6 @@ public class FileManager extends Thread {
     private ArrayList<String> fileList = new ArrayList<>();
     private HashMap<String, String> sharedFiles = new HashMap<>();
     private boolean sendFiles;
-    private boolean receiving;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
@@ -29,7 +28,6 @@ public class FileManager extends Thread {
     public FileManager(NamingNode node){
         this.node = node;
         this.sendFiles = true;
-        this.receiving = false;
         String launchDirectory = System.getProperty("user.dir");
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles");
         System.out.println(this.localFolder);
@@ -66,10 +64,11 @@ public class FileManager extends Thread {
                         }
                     }
                     this.sendFiles = false;
+
                 }
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
-            while(this.receiving) {
+            while(!this.sendFiles) {
                 Socket sendingSocket = receivingSocket.accept();
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
