@@ -65,15 +65,17 @@ public class NamingServer extends Thread{
     public String getFile(@PathVariable(value = "filename") String fileName) {
         this.logger.info("Where is file?: " + fileName);
         int hash = hash(fileName);
-        Map.Entry<Integer,String> entry; //get an entry from the map
+        Map.Entry<Integer, String> entry; //get an entry from the map
         ipMapLock.readLock().lock();
-        if(ipMapping.floorEntry(hash-1) == null){
+        if (ipMapping.floorEntry(hash - 1) == null) {
             entry = ipMapping.lastEntry();
-        }else{
-            entry = ipMapping.floorEntry(hash-1); //returns closest value lower than or equal to key (so where the file is located)
+        } else {
+            entry = ipMapping.floorEntry(hash - 1); //returns closest value lower than or equal to key (so where the file is located)
         }
         ipMapLock.readLock().unlock();
-        return "The file " + fileName + " is located at: " + entry.getValue() +"\n";
+        //return "The file " + fileName + " is located at: " + entry.getValue() + " with ID: " + entry.getKey().toString() + "\n";
+        return "{\"file\":" + "\"" + fileName + "\"" + "," + "\"node ID\":" + entry.getKey() + "," +
+                "\"node IP\":" + entry.getValue() + "}";
     }
     @GetMapping("/NamingServer/Nodes/{node}")
     public String getNodes(@PathVariable(value = "node") String name){
