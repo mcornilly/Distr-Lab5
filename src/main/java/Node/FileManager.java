@@ -31,13 +31,13 @@ public class FileManager extends Thread {
         String launchDirectory = System.getProperty("user.dir");
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles");
         System.out.println(this.localFolder);
-        this.replicatedFolder = new File("\\src\\main\\resources\\ReplicatedFiles\\");
+        this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
         System.out.println(Arrays.toString(this.localFiles));
     }
 
     public void run(){
-        //while(this.node.discoveryNode.getNode().getRunning()) {
+        while(this.node.discoveryNode.getNode().getRunning()) {
             while(this.sendFiles) {
                 //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) {
@@ -79,7 +79,7 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
         }
-    //}
+    }
     private static void receiveFile(String path) throws Exception{
         int bytes = 0;
         String fileName = dataInputStream.readUTF();
@@ -94,19 +94,24 @@ public class FileManager extends Thread {
         fileOutputStream.close();
     }
     private static void sendFile(File file, String IP) throws Exception{
-        Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
-        dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
-        int bytes = 0;
-        FileInputStream fileInputStream = new FileInputStream(file);
-        dataOutputStream.writeUTF(file.getName());
-        dataOutputStream.flush();
-        dataOutputStream.writeLong(file.length());
-        byte[] buffer = new byte[4*1024];
-        while ((bytes=fileInputStream.read(buffer))!=-1){
-            dataOutputStream.write(buffer,0,bytes);
+        try(Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000)) {
+            //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
+            dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
+            int bytes = 0;
+            FileInputStream fileInputStream = new FileInputStream(file);
+            dataOutputStream.writeUTF(file.getName());
             dataOutputStream.flush();
+            dataOutputStream.writeLong(file.length());
+            byte[] buffer = new byte[4 * 1024];
+            while ((bytes = fileInputStream.read(buffer)) != -1) {
+                dataOutputStream.write(buffer, 0, bytes);
+                dataOutputStream.flush();
+            }
+            fileInputStream.close();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        fileInputStream.close();
-        sendingSocket.close();
+
+
     }
 }
