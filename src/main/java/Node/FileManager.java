@@ -23,6 +23,7 @@ public class FileManager extends Thread {
     private File[] localFiles;
     private File localFolder;
     private File replicatedFolder;
+    private File[] replicatedFiles;
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
     public FileManager(NamingNode node){
@@ -80,7 +81,7 @@ public class FileManager extends Thread {
         }
         }
     }
-    private static void receiveFile(String path) throws Exception{
+    private void receiveFile(String path) throws Exception{
         int bytes = 0;
         String fileName = dataInputStream.readUTF();
         FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
@@ -91,6 +92,8 @@ public class FileManager extends Thread {
             size -= bytes;      // read upto file size
         }
         System.out.println("succes receive");
+        this.replicatedFiles = this.replicatedFolder.listFiles();
+        System.out.println(Arrays.toString(this.replicatedFiles));
         fileOutputStream.close();
     }
     private static void sendFile(File file, String IP) throws Exception{
