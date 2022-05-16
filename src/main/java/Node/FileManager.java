@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class FileManager extends Thread {
     private NamingNode node;
     private ArrayList<String> fileList = new ArrayList<>();
-    private HashMap<String, String> sharedFiles = new HashMap<>();
+    private static HashMap<String, String> sharedFiles = new HashMap<>();
     private boolean sendFiles;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
@@ -24,9 +24,10 @@ public class FileManager extends Thread {
     private File localFolder;
     private File replicatedFolder;
     private File[] replicatedFiles;
+    FileChecker fileChecker;
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
-    public FileManager(NamingNode node){
+    public FileManager(NamingNode node) throws IOException {
         this.node = node;
         this.sendFiles = true;
         String launchDirectory = System.getProperty("user.dir");
@@ -36,6 +37,7 @@ public class FileManager extends Thread {
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
         System.out.println(Arrays.toString(this.localFiles));
+        this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles");
     }
 
     public void run(){
@@ -46,24 +48,12 @@ public class FileManager extends Thread {
                 if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     System.out.println(Arrays.toString(this.localFiles));
                     for (File f : this.localFiles) { // for every local File
-                        System.out.println(f.getName()); //print out the name
-                        String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                        if (!fileLocation.equals("Error")) {
-                            JSONParser parser = new JSONParser();
-                            try {
-                                Object obj = parser.parse(fileLocation);
-                                int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
-                                System.out.println("local" + InetAddress.getLocalHost().getHostAddress());
-                                String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
-                                if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
-                                    sendFile(f, locationIP); //sendFile to the right node
-                                    this.sharedFiles.put(f.getName(), locationIP); //keep track of which files are shared
-                                }
-                                System.out.println("succes send");
-                                System.out.println(this.sharedFiles);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        try {
+                            System.out.println(f.getName()); //print out the name
+                            String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
+                            sendFile(f, fileLocation);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                     this.sendFiles = false;
@@ -102,25 +92,42 @@ public class FileManager extends Thread {
         System.out.println(Arrays.toString(this.replicatedFiles));
         fileOutputStream.close();
     }
-    private static void sendFile(File file, String IP) throws Exception{
-        try(Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000)) {
-            //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
-            dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
-            int bytes = 0;
-            FileInputStream fileInputStream = new FileInputStream(file);
-            dataOutputStream.writeUTF(file.getName());
-            dataOutputStream.flush();
-            dataOutputStream.writeLong(file.length());
-            byte[] buffer = new byte[4 * 1024];
-            while ((bytes = fileInputStream.read(buffer)) != -1) {
-                dataOutputStream.write(buffer, 0, bytes);
-                dataOutputStream.flush();
-            }
-            fileInputStream.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    static void sendFile(File file, String fileLocation) throws Exception{
+        if (!fileLocation.equals("Error")) {
+            JSONParser parser = new JSONParser();
+            try {
+                Object obj = parser.parse(fileLocation);
+                int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
+                System.out.println("local" + InetAddress.getLocalHost().getHostAddress());
+                String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
+                if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
+                    try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), 5000)) {
+                        //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
+                        dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
+                        int bytes = 0;
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        dataOutputStream.writeUTF(file.getName());
+                        dataOutputStream.flush();
+                        dataOutputStream.writeLong(file.length());
+                        byte[] buffer = new byte[4 * 1024];
+                        while ((bytes = fileInputStream.read(buffer)) != -1) {
+                            dataOutputStream.write(buffer, 0, bytes);
+                            dataOutputStream.flush();
+                        }
+                        fileInputStream.close();
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
+                }
+                System.out.println("succes send");
+                System.out.println(sharedFiles);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    static void deleteFile(File file, String fileLocation) {
 
     }
 }
