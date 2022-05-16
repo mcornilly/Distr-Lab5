@@ -18,8 +18,10 @@ public class FileChecker extends Thread {
 
 
     public FileChecker(NamingNode node, String localDirectory) throws IOException {
+        System.out.println("hello");
         this.node = node;
         this.path = Paths.get(localDirectory);
+        System.out.println(this.path.toString());
         this.watchService = FileSystems.getDefault().newWatchService();
     }
 
