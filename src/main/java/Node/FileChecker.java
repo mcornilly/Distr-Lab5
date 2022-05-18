@@ -42,7 +42,7 @@ public class FileChecker extends Thread {
             while (true){//this.node.discoveryNode.getNode().getRunning()) {
                 System.out.println("hello");
                 while ((key = watchService.take()) != null) {
-                    Time.sleep(200);
+                    Thread.sleep(200);
 
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
