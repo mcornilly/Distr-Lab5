@@ -40,10 +40,9 @@ public class FileChecker extends Thread {
                     StandardWatchEventKinds.ENTRY_MODIFY);
             WatchKey key;
             while (true){//this.node.discoveryNode.getNode().getRunning()) {
-                System.out.println("hello");
                 while ((key = watchService.take()) != null) {
                     Thread.sleep(200);
-
+                    System.out.println("hello");
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
                         System.out.println(file.getName()); //print out the name
