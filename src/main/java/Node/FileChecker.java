@@ -3,6 +3,7 @@ package Node;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Arrays;
 
 import org.apache.tomcat.jni.Time;
 
@@ -15,14 +16,23 @@ public class FileChecker extends Thread {
     private final NamingNode node;
     private final WatchService watchService;
     private final Path path;
+    //TEST
+    private File[] localFiles;
+    private File localFolder;
+
 
 
     public FileChecker(NamingNode node, String localDirectory) throws IOException {
-        System.out.println("hello");
         this.node = node;
         this.path = Paths.get(localDirectory);
         System.out.println(this.path.toString());
         this.watchService = FileSystems.getDefault().newWatchService();
+        //TEST
+        String launchDirectory = System.getProperty("user.dir");
+        this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
+        System.out.println(this.localFolder);
+        this.localFiles = this.localFolder.listFiles();
+
     }
 
 
@@ -36,9 +46,12 @@ public class FileChecker extends Thread {
                     StandardWatchEventKinds.ENTRY_DELETE,
                     StandardWatchEventKinds.ENTRY_MODIFY);
             WatchKey key;
-            while (true) {
+            while (this.node.discoveryNode.getNode().getRunning()) {
+                System.out.println("hello");
+
                 while ((key = watchService.take()) != null) {
-                    //Time.sleep(200);
+                    Time.sleep(200);
+                    System.out.println(Arrays.toString(this.localFiles));
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
                         System.out.println(file.getName()); //print out the name
