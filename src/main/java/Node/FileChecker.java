@@ -40,12 +40,17 @@ public class FileChecker extends Thread {
     @Override
     public void run() {
         try {
+            /*
             this.path.register(
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE,
                     StandardWatchEventKinds.ENTRY_DELETE,
                     StandardWatchEventKinds.ENTRY_MODIFY);
+
+             */
             WatchKey key;
+
+
             while (this.node.discoveryNode.getNode().getRunning()) {
                 System.out.println("hello");
 
