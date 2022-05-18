@@ -33,7 +33,7 @@ public class NamingNode {
     public String getFile(String filename) {
         try {
             //String URL = "http://localhost:8080/NamingServer/getFile/" + filename; //REST command
-            System.out.println(discoveryNode.getServerIP());
+            //System.out.println(discoveryNode.getServerIP());
             //String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Files/" + filename;
             String URL = "http://" + "192.168.80.3" + ":8080/NamingServer/Files/" + filename;
             System.out.println(Unirest.get(URL).asString().getBody());

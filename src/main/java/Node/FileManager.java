@@ -99,7 +99,7 @@ public class FileManager extends Thread {
             try {
                 Object obj = parser.parse(fileLocation);
                 int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
-                System.out.println("local" + InetAddress.getLocalHost().getHostAddress());
+                //System.out.println("Sending to: " + InetAddress.getLocalHost().getHostAddress());
                 String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
                 if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
                     try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), 5000)) {
@@ -121,7 +121,7 @@ public class FileManager extends Thread {
                     }
 
                 }
-                System.out.println("succes send");
+                System.out.println("File was sent to: " + locationIP);
                 System.out.println(sharedFiles);
             } catch (Exception e) {
                 e.printStackTrace();
