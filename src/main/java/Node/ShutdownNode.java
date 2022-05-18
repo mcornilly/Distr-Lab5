@@ -1,10 +1,11 @@
 package Node;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ShutdownNode extends Thread{
     private final NamingNode node;
@@ -14,9 +15,12 @@ public class ShutdownNode extends Thread{
     private final String previousIP;
     private final String nextIP;
     private final DatagramSocket shutdownSocket;
+    private final FileManager fileManager;
+    private HashMap<String, String> sharedfiles;
 
-    public ShutdownNode(NamingNode node) throws SocketException {
+    public ShutdownNode(NamingNode node, FileManager fileManager) throws SocketException {
         this.node = node;
+        this.fileManager = fileManager;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
@@ -25,6 +29,10 @@ public class ShutdownNode extends Thread{
         this.previousIP = node.discoveryNode.getPreviousIP();
         this.shutdownSocket = new DatagramSocket(8002);
         this.shutdownSocket.setSoTimeout(1000);
+        this.sharedfiles = FileManager.getSharedFiles();
+
+
+
         node.delete(currentID);
 
     }
@@ -43,10 +51,28 @@ public class ShutdownNode extends Thread{
             nextResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"previousNode\"," + "\"senderID\":" + currentID + "," + "\"previousID\":" + previousID + "," + "\"previousIP\":" + "\"" + previousIP + "\"" + "}";
             DatagramPacket nextNode = new DatagramPacket(nextResponse.getBytes(), nextResponse.length(), InetAddress.getByName(nextIP), 8001);
             shutdownSocket.send(nextNode);
+            sharedFilesShutdown();
             this.node.setRunning(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    public void sharedFilesShutdown() throws IOException {
+        Set<Map.Entry<String,String>> entries = this.sharedfiles.entrySet();
+        for (Map.Entry<String, String> entry : entries) {
+            String response;
+            response = "{\"status\":\"ShutdownFile\","  + "\"senderID\":" + currentID + "," +
+                     "\"filename\":" + "\"" + entry.getKey() + "\"" + "}";
+            DatagramPacket file = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(entry.getValue()), 8001); // In Discovery node nog antwoord krijgen
+            shutdownSocket.send(file);
+        }
+    }
+
+    public void sendReplicatedFile() {
+
+    }
+
 
 }
+
+

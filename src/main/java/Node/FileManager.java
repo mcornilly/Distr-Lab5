@@ -16,7 +16,18 @@ import java.util.HashMap;
 public class FileManager extends Thread {
     private NamingNode node;
     private ArrayList<String> fileList = new ArrayList<>();
+
+    public static HashMap<String, String> getSharedFiles() {
+        return sharedFiles;
+    }
+
+    public static void setSharedFiles(HashMap<String, String> sharedFiles) {
+        FileManager.sharedFiles = sharedFiles;
+    }
+
     private static HashMap<String, String> sharedFiles = new HashMap<>();
+    private static HashMap<String, String> logFiles = new HashMap<>();
+
     private boolean sendFiles;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
@@ -39,6 +50,7 @@ public class FileManager extends Thread {
         System.out.println(Arrays.toString(this.localFiles));
         this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles");
         this.fileChecker.start();
+
     }
 
     public void run(){
@@ -66,7 +78,8 @@ public class FileManager extends Thread {
                 Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
-                receiveFile(this.replicatedFolder.toString()); //receive the file
+                String remoteIP = sendingSocket.getRemoteSocketAddress().toString();
+                receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
             }
         } catch (Exception e){
@@ -78,7 +91,7 @@ public class FileManager extends Thread {
 
 
     //Handling receive & send of files
-    private void receiveFile(String path) throws Exception{
+    private void receiveFile(String path, String remoteIP) throws Exception{
         int bytes = 0;
         String fileName = dataInputStream.readUTF();
         FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
@@ -90,6 +103,8 @@ public class FileManager extends Thread {
         }
         System.out.println("succes receive");
         this.replicatedFiles = this.replicatedFolder.listFiles();
+        System.out.println(remoteIP);
+        logFiles.put(fileName, remoteIP);
         System.out.println(Arrays.toString(this.replicatedFiles));
         fileOutputStream.close();
     }
@@ -119,6 +134,7 @@ public class FileManager extends Thread {
                     }catch (Exception e) {
                         e.printStackTrace();
                     }
+                    sharedFiles.put(file.getName(), locationIP);
                     System.out.println("File was sent to: " + locationIP);
                 }
 
