@@ -42,25 +42,23 @@ public class FileChecker extends Thread {
             while (true){//this.node.discoveryNode.getNode().getRunning()) {
                 while ((key = watchService.take()) != null) {
                     Thread.sleep(200);
-                    System.out.println("hello");
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
                         System.out.println(file.getName()); //print out the name
                         String fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
                         switch (event.kind().toString()) {
                             case "ENTRY_CREATE":
+                                //logfile?
+                                //System.out.println(
+                                        //"Event kind:" + event.kind()
+                                                //+ ". File affected: " + event.context() + ".");
                                 FileManager.sendFile(file, fileLocation);
                                 System.out.println("Created File: " + file.getName());
-                                //logfile?
-                                System.out.println(
-                                        "Event kind:" + event.kind()
-                                                + ". File affected: " + event.context() + ".");
                                 break;
                             case "ENTRY_DELETE":
-
-                                System.out.println(
-                                        "Event kind:" + event.kind()
-                                                + ". File affected: " + event.context() + ".");
+                                //System.out.println(
+                                        //"Event kind:" + event.kind()
+                                                //+ ". File affected: " + event.context() + ".");
                                 FileManager.deleteFile(file, fileLocation);
                                 System.out.println("Deleted File: " + file.getName());
                                 break;
