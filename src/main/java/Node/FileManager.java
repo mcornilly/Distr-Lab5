@@ -38,6 +38,7 @@ public class FileManager extends Thread {
         this.localFiles = this.localFolder.listFiles();
         System.out.println(Arrays.toString(this.localFiles));
         this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles");
+        this.fileChecker.start();
     }
 
     public void run(){

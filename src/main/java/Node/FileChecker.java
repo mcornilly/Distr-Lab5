@@ -30,19 +30,17 @@ public class FileChecker extends Thread {
     //https://www.baeldung.com/java-nio2-watchservice
     @Override
     public void run() {
-        WatchKey key;
+
         try {
-            /*
+
             this.path.register(
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE,
                     StandardWatchEventKinds.ENTRY_DELETE,
                     StandardWatchEventKinds.ENTRY_MODIFY);
-
-             */
+            WatchKey key;
             while (true){//this.node.discoveryNode.getNode().getRunning()) {
                 System.out.println("hello");
-
                 while ((key = watchService.take()) != null) {
                     Time.sleep(200);
 

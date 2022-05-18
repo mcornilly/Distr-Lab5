@@ -34,10 +34,6 @@ public class DiscoveryNode extends Thread {
     private int previousAnswer;
     private int nextAnswer;
 
-    //TESTING
-    private File[] localFiles;
-    private File localFolder;
-
 
     /*GETTERS AND SETTERS*/
 
@@ -159,14 +155,6 @@ public class DiscoveryNode extends Thread {
 
 
 
-
-            //TESTING
-            String launchDirectory = System.getProperty("user.dir");
-            this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
-            System.out.println(this.localFolder);
-            this.localFiles = this.localFolder.listFiles();
-
-
         } catch (SocketException e) {
             this.discoverySocket = null;
             this.answerSocket = null;
@@ -186,8 +174,7 @@ public class DiscoveryNode extends Thread {
         while (isDiscoveryPhase() && getNode().getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
-                this.localFiles = this.localFolder.listFiles();
-                System.out.println(Arrays.toString(this.localFiles));
+
                 getDiscoverySocket().send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 getDiscoverySocket().receive(receivePacket); // receive a packet on this socket
