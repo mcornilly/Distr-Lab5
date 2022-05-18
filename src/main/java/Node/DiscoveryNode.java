@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,6 +12,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DiscoveryNode extends Thread {
@@ -31,6 +33,10 @@ public class DiscoveryNode extends Thread {
     private boolean discoveryPhase;
     private int previousAnswer;
     private int nextAnswer;
+
+    //TESTING
+    private File[] localFiles;
+    private File localFolder;
 
 
     /*GETTERS AND SETTERS*/
@@ -149,7 +155,18 @@ public class DiscoveryNode extends Thread {
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
             this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
-            this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yet
+            this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yetµ
+
+
+
+
+            //TESTING
+            String launchDirectory = System.getProperty("user.dir");
+            this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
+            System.out.println(this.localFolder);
+            this.localFiles = this.localFolder.listFiles();
+
+
         } catch (SocketException e) {
             this.discoverySocket = null;
             this.answerSocket = null;
@@ -169,6 +186,8 @@ public class DiscoveryNode extends Thread {
         while (isDiscoveryPhase() && getNode().getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
+                this.localFiles = this.localFolder.listFiles();
+                System.out.println(Arrays.toString(this.localFiles));
                 getDiscoverySocket().send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 getDiscoverySocket().receive(receivePacket); // receive a packet on this socket

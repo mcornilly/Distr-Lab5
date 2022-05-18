@@ -16,9 +16,6 @@ public class FileChecker extends Thread {
     private final NamingNode node;
     private final WatchService watchService;
     private final Path path;
-    //TEST
-    private File[] localFiles;
-    private File localFolder;
 
 
 
@@ -27,12 +24,6 @@ public class FileChecker extends Thread {
         this.path = Paths.get(localDirectory);
         System.out.println(this.path.toString());
         this.watchService = FileSystems.getDefault().newWatchService();
-        //TEST
-        String launchDirectory = System.getProperty("user.dir");
-        this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
-        System.out.println(this.localFolder);
-        this.localFiles = this.localFolder.listFiles();
-
     }
 
 
@@ -54,7 +45,7 @@ public class FileChecker extends Thread {
 
                 while ((key = watchService.take()) != null) {
                     Time.sleep(200);
-                    System.out.println(Arrays.toString(this.localFiles));
+
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
                         System.out.println(file.getName()); //print out the name
