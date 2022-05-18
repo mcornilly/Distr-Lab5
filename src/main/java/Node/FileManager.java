@@ -119,9 +119,9 @@ public class FileManager extends Thread {
                     }catch (Exception e) {
                         e.printStackTrace();
                     }
-
+                    System.out.println("File was sent to: " + locationIP);
                 }
-                System.out.println("File was sent to: " + locationIP);
+
                 System.out.println(sharedFiles);
             } catch (Exception e) {
                 e.printStackTrace();
