@@ -26,6 +26,8 @@ public class NamingNode {
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
         this.name = name;
         //start discovery
+        this.discoveryNode = new DiscoveryNode(name, this);
+        this.discoveryNode.start();
 
 
     }
