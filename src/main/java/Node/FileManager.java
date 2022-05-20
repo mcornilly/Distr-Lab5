@@ -55,9 +55,10 @@ public class FileManager extends Thread {
     @Override
     public void run(){
         //Starting the FileManager
+        //what if a node is added? maybe here in filemanager or filechecker another function
         while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running
             while(this.sendFiles) {
-                //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     System.out.println(Arrays.toString(this.localFiles));
                     System.out.println("test");
