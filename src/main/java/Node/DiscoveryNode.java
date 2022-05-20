@@ -30,6 +30,7 @@ public class DiscoveryNode extends Thread {
     private int nextID; //ID of the next node
     private String name; //name of the current node
     private final NamingNode node; //NamingNode
+    private final FileManager fileManager;
     private volatile boolean discoveryPhase;
     private int previousAnswer;
     private int nextAnswer;
@@ -135,6 +136,8 @@ public class DiscoveryNode extends Thread {
     }
 
     public DiscoveryNode(String name, NamingNode node) throws IOException {
+        this.fileManager = new FileManager(node);
+        this.fileManager.start();
         this.node = node;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
@@ -151,7 +154,10 @@ public class DiscoveryNode extends Thread {
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
             this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
-            this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yetµ
+            this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yet
+
+
+
 
 
 
@@ -234,11 +240,31 @@ public class DiscoveryNode extends Thread {
                             setNextIP(IP);
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
+                            //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
+                            this.fileManager.setUpdate(true);
+                            this.fileManager.setSendFiles(true);
+
                         } else if (hash < getCurrentID() && (getPreviousID() < hash || getPreviousID() == getCurrentID())) {
                             setPreviousID(hash);
                             setPreviousIP(IP);
                             response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
+                            //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
+                            try {
+                                Thread.sleep(2000); //sleep for two seconds because we give the new node some time to finish its discovery
+                                //solution => sending and receiving in a diff thread??
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                Thread.sleep(2000); //sleep for two seconds because we give the new node some time to finish its discovery
+                                //solution => sending and receiving in a diff thread??
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            this.fileManager.setUpdate(true);
+                            this.fileManager.setSendFiles(true);
+
                         } else {
                             response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
@@ -294,7 +320,15 @@ public class DiscoveryNode extends Thread {
                         if(senderID == getNextID()){
                             setNextAnswer(0);
                         }
-                    }               }
+                    }
+                }if(status.equals("UpdateFile")){ //if the file location was updated for one of our local files
+                    System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                    System.out.println("received data: " + receivedData);
+                    String sender = ((JSONObject) obj).get("sender").toString();
+                    String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
+                    String location = ((JSONObject) obj).get("location").toString(); //get the location where the new file is
+                    FileManager.getSentFiles().replace(filename, location); //update our local mapping
+                }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }

@@ -5,10 +5,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,12 +28,36 @@ public class FileManager extends Thread {
         FileManager.sentFiles = sentFiles;
     }
 
+    public boolean isSendFiles() {
+        return sendFiles;
+    }
+
+    public void setSendFiles(boolean sendFiles) {
+        this.sendFiles = sendFiles;
+    }
+
+    public boolean isStartup() {
+        return startup;
+    }
+
+    public void setStartup(boolean startup) {
+        this.startup = startup;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    public void setUpdate(boolean update) {
+        this.update = update;
+    }
+
     private static HashMap<String, String> sentFiles = new HashMap<>(); //files we have shared
     private static HashMap<String, String> receivedFiles = new HashMap<>();
 
-    private boolean sendFiles;
+    private volatile boolean sendFiles;
     private boolean startup;
-    private boolean update;
+    private volatile boolean update;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
@@ -64,6 +91,7 @@ public class FileManager extends Thread {
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (this.startup && !this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));
+                    System.out.println("Distribute all our LocalFiles at startup");
                     for (File f : this.localFiles) { // for every local File
                         try {
                             System.out.println("Filename:" + f.getName()); //print out the name
@@ -77,6 +105,11 @@ public class FileManager extends Thread {
                     this.sendFiles = false;
                 }
                 else if(sendFiles && update) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     this.localFiles = this.localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File
                         try {
@@ -93,22 +126,35 @@ public class FileManager extends Thread {
                     this.replicatedFiles = this.replicatedFolder.listFiles(); //update to most recent
                     for (File f : this.replicatedFiles){ //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
                         try {
-
+                            System.out.println("Filename:" + f.getName()); //print out the name
+                            String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
+                            boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
+                            if (transfer){
+                                //sent message that the file is updated to the local owner
+                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.node.discoveryNode.getCurrentID() + ","
+                                        + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
+                                DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
+                                this.node.discoveryNode.getAnswerSocket().send(updateFile); //sent the packet
+                                receivedFiles.remove(f.getName()); //remove from our receivedfiles map
+                                f.delete(); //delete the file in replicated folder because we  sent it to the right owner
+                            }
                         } catch (Exception e){
 
                         }
                     }
                     //for sending files when we get a new neighbour, check all of our localfiles and replicatedFiles if we need to pass them on to this new neighbour
                     //send replicated file to its new owner
+                    this.update = false;
+                    this.sendFiles = false;
                 }
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
             while(!this.sendFiles) { //while we are not sending anymore
                 Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
-                System.out.println(sendingSocket + " connected.");
+                System.out.println(sendingSocket + " connected for receiving a file");
                 String remoteIP = sendingSocket.getLocalAddress().getHostAddress();
-                System.out.println("IP" + remoteIP);
+                // System.out.println("IP" + remoteIP);
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
             }
@@ -135,7 +181,7 @@ public class FileManager extends Thread {
         receivedFiles.put(fileName, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
     }
-    static void sendFile(File file, String fileLocation) throws Exception{
+    static boolean sendFile(File file, String fileLocation) throws Exception{
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
             try {
@@ -164,12 +210,14 @@ public class FileManager extends Thread {
                     sentFiles.put(file.getName(), locationIP);
                     System.out.println("File was sent to: " + locationIP);
                 }
-
-                System.out.println(sentFiles);
+                System.out.println("sentFiles log: " + sentFiles);
+                return !locationIP.equals(InetAddress.getLocalHost().getHostAddress());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
+        return false;
     }
     static void deleteFile(File file, String fileLocation) { //
 

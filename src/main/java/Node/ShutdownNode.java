@@ -15,12 +15,12 @@ public class ShutdownNode extends Thread{
     private final String previousIP;
     private final String nextIP;
     private final DatagramSocket shutdownSocket;
-    private final FileManager fileManager;
+    //private final FileManager fileManager;
     private final HashMap<String, String> sharedfiles;
 
-    public ShutdownNode(NamingNode node, FileManager fileManager) throws SocketException {
+    public ShutdownNode(NamingNode node) throws SocketException {
         this.node = node;
-        this.fileManager = fileManager;
+        //this.fileManager = fileManager;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
