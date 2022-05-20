@@ -30,7 +30,7 @@ public class DiscoveryNode extends Thread {
     private int nextID; //ID of the next node
     private String name; //name of the current node
     private final NamingNode node; //NamingNode
-    private boolean discoveryPhase;
+    private volatile boolean discoveryPhase;
     private int previousAnswer;
     private int nextAnswer;
 
