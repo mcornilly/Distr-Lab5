@@ -17,18 +17,20 @@ public class FileManager extends Thread {
     private NamingNode node;
     private ArrayList<String> fileList = new ArrayList<>();
 
-    public static HashMap<String, String> getSharedFiles() {
-        return sharedFiles;
+    public static HashMap<String, String> getSentFiles() {
+        return sentFiles;
     }
 
-    public static void setSharedFiles(HashMap<String, String> sharedFiles) {
-        FileManager.sharedFiles = sharedFiles;
+    public static void setSentFiles(HashMap<String, String> sentFiles) {
+        FileManager.sentFiles = sentFiles;
     }
 
-    private static HashMap<String, String> sharedFiles = new HashMap<>();
-    private static HashMap<String, String> logFiles = new HashMap<>();
+    private static HashMap<String, String> sentFiles = new HashMap<>(); //files we have shared
+    private static HashMap<String, String> receivedFiles = new HashMap<>();
 
     private boolean sendFiles;
+    private boolean startup;
+    private boolean update;
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
@@ -40,15 +42,17 @@ public class FileManager extends Thread {
     //If we start a node, we want to send all our files to the respective
     public FileManager(NamingNode node) throws IOException {
         this.node = node;
+        this.startup = true;
         this.sendFiles = true;
+        this.update = false;
         String launchDirectory = System.getProperty("user.dir");
         //System.out.println(launchDirectory);
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
-        //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles");
-        //this.fileChecker.start();
+        this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
+        this.fileChecker.start();
 
     }
     @Override
@@ -57,8 +61,8 @@ public class FileManager extends Thread {
         //what if a node is added? maybe here in filemanager or filechecker another function
         while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
             while(this.sendFiles) {
-                //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
-                if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
+                // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                if (this.startup && !this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));
                     for (File f : this.localFiles) { // for every local File
                         try {
@@ -69,7 +73,33 @@ public class FileManager extends Thread {
                             e.printStackTrace();
                         }
                     }
+                    this.startup = false;
                     this.sendFiles = false;
+                }
+                else if(sendFiles && update) {
+                    this.localFiles = this.localFolder.listFiles();
+                    for (File f : this.localFiles) { // for every local File
+                        try {
+                            if (!sentFiles.containsKey(f.getName())) //If the file is not in the shared lists so we still have it ourselves, check if we need to send it
+                            {
+                                System.out.println("Filename:" + f.getName()); //print out the name
+                                String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
+                                sendFile(f, fileLocation);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    this.replicatedFiles = this.replicatedFolder.listFiles(); //update to most recent
+                    for (File f : this.replicatedFiles){ //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
+                        try {
+
+                        } catch (Exception e){
+
+                        }
+                    }
+                    //for sending files when we get a new neighbour, check all of our localfiles and replicatedFiles if we need to pass them on to this new neighbour
+                    //send replicated file to its new owner
                 }
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
@@ -77,7 +107,8 @@ public class FileManager extends Thread {
                 Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
-                String remoteIP = sendingSocket.getInetAddress().toString();
+                String remoteIP = sendingSocket.getLocalAddress().toString();
+                System.out.println("IP" + remoteIP);
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
             }
@@ -101,7 +132,7 @@ public class FileManager extends Thread {
         fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
         //System.out.println(remoteIP);
-        logFiles.put(fileName, remoteIP);
+        receivedFiles.put(fileName, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
     }
     static void sendFile(File file, String fileLocation) throws Exception{
@@ -130,17 +161,17 @@ public class FileManager extends Thread {
                     }catch (Exception e) {
                         e.printStackTrace();
                     }
-                    sharedFiles.put(file.getName(), locationIP);
+                    sentFiles.put(file.getName(), locationIP);
                     System.out.println("File was sent to: " + locationIP);
                 }
 
-                System.out.println(sharedFiles);
+                System.out.println(sentFiles);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-    static void deleteFile(File file, String fileLocation) {
+    static void deleteFile(File file, String fileLocation) { //
 
     }
 }
