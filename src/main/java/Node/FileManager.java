@@ -107,7 +107,7 @@ public class FileManager extends Thread {
                 Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
-                String remoteIP = sendingSocket.getLocalAddress().toString();
+                String remoteIP = sendingSocket.getLocalAddress().getHostAddress();
                 System.out.println("IP" + remoteIP);
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
