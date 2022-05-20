@@ -18,8 +18,6 @@ public class FileChecker extends Thread {
     private final Path path;
     private String fileLocation;
 
-
-
     public FileChecker(NamingNode node, String localDirectory) throws IOException {
         this.node = node;
         this.path = Paths.get(localDirectory);
@@ -67,7 +65,6 @@ public class FileChecker extends Thread {
                     }
                     key.reset();
                 }
-
             }
         }catch (Exception e) {
             e.printStackTrace();

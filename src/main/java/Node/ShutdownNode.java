@@ -16,7 +16,7 @@ public class ShutdownNode extends Thread{
     private final String nextIP;
     private final DatagramSocket shutdownSocket;
     private final FileManager fileManager;
-    private HashMap<String, String> sharedfiles;
+    private final HashMap<String, String> sharedfiles;
 
     public ShutdownNode(NamingNode node, FileManager fileManager) throws SocketException {
         this.node = node;
@@ -30,11 +30,6 @@ public class ShutdownNode extends Thread{
         this.shutdownSocket = new DatagramSocket(8002);
         this.shutdownSocket.setSoTimeout(1000);
         this.sharedfiles = FileManager.getSharedFiles();
-
-
-
-        node.delete(currentID);
-
     }
     @Override
     public void start(){
@@ -51,13 +46,16 @@ public class ShutdownNode extends Thread{
             nextResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"previousNode\"," + "\"senderID\":" + currentID + "," + "\"previousID\":" + previousID + "," + "\"previousIP\":" + "\"" + previousIP + "\"" + "}";
             DatagramPacket nextNode = new DatagramPacket(nextResponse.getBytes(), nextResponse.length(), InetAddress.getByName(nextIP), 8001);
             shutdownSocket.send(nextNode);
-            sharedFilesShutdown();
+            //sharedFilesShutdown();
+            this.node.delete(currentID);
             this.node.setRunning(false);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     public void sharedFilesShutdown() throws IOException {
+        // tell owners of the file that we are shutting down
         Set<Map.Entry<String,String>> entries = this.sharedfiles.entrySet();
         for (Map.Entry<String, String> entry : entries) {
             String response;
