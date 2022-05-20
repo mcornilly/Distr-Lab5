@@ -57,7 +57,7 @@ public class FileManager extends Thread {
         //Starting the FileManager
         while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running
             while(this.sendFiles) {
-                System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     System.out.println(Arrays.toString(this.localFiles));
                     System.out.println("test");
@@ -71,7 +71,6 @@ public class FileManager extends Thread {
                         }
                     }
                     this.sendFiles = false;
-
                 }
             }
         try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
@@ -79,7 +78,7 @@ public class FileManager extends Thread {
                 Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected.");
-                String remoteIP = sendingSocket.getRemoteSocketAddress().toString();
+                String remoteIP = sendingSocket.getInetAddress().toString();
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
             }
@@ -103,11 +102,11 @@ public class FileManager extends Thread {
             size -= bytes;      // read upto file size
         }
         System.out.println("succes receive");
+        fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
         System.out.println(remoteIP);
         logFiles.put(fileName, remoteIP);
         System.out.println(Arrays.toString(this.replicatedFiles));
-        fileOutputStream.close();
     }
     static void sendFile(File file, String fileLocation) throws Exception{
         if (!fileLocation.equals("Error")) {
