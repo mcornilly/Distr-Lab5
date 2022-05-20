@@ -52,7 +52,7 @@ public class FileManager extends Thread {
         //this.fileChecker.start();
 
     }
-
+    @Override
     public void run(){
         //Starting the FileManager
         while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running
@@ -60,6 +60,7 @@ public class FileManager extends Thread {
                 //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     System.out.println(Arrays.toString(this.localFiles));
+                    System.out.println("test");
                     for (File f : this.localFiles) { // for every local File
                         try {
                             System.out.println(f.getName()); //print out the name
