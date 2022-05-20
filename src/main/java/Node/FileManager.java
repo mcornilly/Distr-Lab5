@@ -18,7 +18,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class FileManager extends Thread {
-    private NamingNode node;
+    private final NamingNode node;
+    private DiscoveryNode discoveryNode;
     private ArrayList<String> fileList = new ArrayList<>();
 
     public static HashMap<String, String> getSentFiles() {
@@ -68,8 +69,9 @@ public class FileManager extends Thread {
     FileChecker fileChecker;
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
-    public FileManager(NamingNode node) throws IOException {
+    public FileManager(NamingNode node, DiscoveryNode discoveryNode) throws IOException {
         this.node = node;
+        this.discoveryNode = discoveryNode;
         this.startup = true;
         this.sendFiles = true;
         this.update = false;
@@ -87,10 +89,10 @@ public class FileManager extends Thread {
     public void run(){
         //Starting the FileManager
         //what if a node is added? maybe here in filemanager or filechecker another function
-        while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
+        while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
             while(this.sendFiles) {
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
-                if (this.startup && !this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
+                if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));
                     System.out.println("Distribute all our LocalFiles at startup");
                     for (File f : this.localFiles) { // for every local File
@@ -132,10 +134,10 @@ public class FileManager extends Thread {
                             boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
                             if (transfer){
                                 //sent message that the file is updated to the local owner
-                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.node.discoveryNode.getCurrentID() + ","
+                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.discoveryNode.getCurrentID() + ","
                                         + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
                                 DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
-                                this.node.discoveryNode.getAnswerSocket().send(updateFile); //sent the packet
+                                this.discoveryNode.getAnswerSocket().send(updateFile); //sent the packet
                                 receivedFiles.remove(f.getName()); //remove from our receivedfiles map
                                 f.delete(); //delete the file in replicated folder because we  sent it to the right owner
                             }

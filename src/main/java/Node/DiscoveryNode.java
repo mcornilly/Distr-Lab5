@@ -137,8 +137,6 @@ public class DiscoveryNode extends Thread {
 
     public DiscoveryNode(String name, NamingNode node) throws IOException {
         this.node = node;
-        this.fileManager = new FileManager(this.node);
-        this.fileManager.start();
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
             this.nextAnswer = 0;
@@ -156,17 +154,15 @@ public class DiscoveryNode extends Thread {
             this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
             this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yet
 
-
-
-
-
-
         } catch (SocketException e) {
             this.discoverySocket = null;
             this.answerSocket = null;
             System.out.println("Something went wrong during construction of DiscoveryNode");
             e.printStackTrace();
         }
+        this.fileManager = new FileManager(this.node, this);
+        this.fileManager.start();
+
     }
     @Override
     public void run(){
