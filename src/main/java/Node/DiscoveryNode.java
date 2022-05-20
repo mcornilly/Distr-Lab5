@@ -176,10 +176,10 @@ public class DiscoveryNode extends Thread {
                 Thread.sleep(1000);
 
                 getDiscoverySocket().send(sendPacket);
-                System.out.println("sent packet to: " + sendPacket.getSocketAddress());
+                System.out.println("sent discovery packet to: " + sendPacket.getSocketAddress());
                 getDiscoverySocket().receive(receivePacket); // receive a packet on this socket
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
-                System.out.println("Packet received from: " + receivePacket.getSocketAddress());
+                System.out.println("Discovery Answer packet received from: " + receivePacket.getSocketAddress());
                 System.out.println("received data: " + receivedData);
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
@@ -224,7 +224,7 @@ public class DiscoveryNode extends Thread {
                 String status = ((JSONObject) obj).get("status").toString();
                 if(status.equals("Discovery")) {
                     if ((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
-                        System.out.println("Package received from: " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("Discovery package received from: " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         nodesList2.add(IP); //add to our list of received IPs
                         String response;
                         String name = ((JSONObject) obj).get("name").toString();
@@ -250,7 +250,7 @@ public class DiscoveryNode extends Thread {
                 //If a neighbour node shuts down, handle this packet and update our neighbours
                 if(status.equals("Shutdown")){
                     if(!s1.equals(s2)) {
-                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("Shutdown Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         String sender = ((JSONObject) obj).get("sender").toString(); //get the sender, either nextNode or PreviousNode
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
@@ -274,7 +274,7 @@ public class DiscoveryNode extends Thread {
                 }
                 if(status.equals("FailureOK")){
                     if(!s1.equals(s2)) {
-                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("FailureOK package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         int removedID = (int) (long) ((JSONObject) obj).get("removedID"); //get removedID
                         setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
@@ -285,7 +285,7 @@ public class DiscoveryNode extends Thread {
                     }
                 }if(status.equals("Ping")){
                     if(!s1.equals(s2)) {
-                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("Ping package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         if (senderID == getPreviousID()){
