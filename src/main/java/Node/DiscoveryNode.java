@@ -136,9 +136,9 @@ public class DiscoveryNode extends Thread {
     }
 
     public DiscoveryNode(String name, NamingNode node) throws IOException {
-        this.fileManager = new FileManager(node);
-        this.fileManager.start();
         this.node = node;
+        this.fileManager = new FileManager(this.node);
+        this.fileManager.start();
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
             this.nextAnswer = 0;
@@ -250,18 +250,7 @@ public class DiscoveryNode extends Thread {
                             response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                             //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
-                            try {
-                                Thread.sleep(2000); //sleep for two seconds because we give the new node some time to finish its discovery
-                                //solution => sending and receiving in a diff thread??
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                Thread.sleep(2000); //sleep for two seconds because we give the new node some time to finish its discovery
-                                //solution => sending and receiving in a diff thread??
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+
                             this.fileManager.setUpdate(true);
                             this.fileManager.setSendFiles(true);
 
