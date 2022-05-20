@@ -82,7 +82,7 @@ public class FileManager extends Thread {
         this.localFiles = this.localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
         this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
-        this.fileChecker.start();
+        //this.fileChecker.start();
 
     }
     @Override

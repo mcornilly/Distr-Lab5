@@ -78,8 +78,9 @@ public class FileReceive extends Thread{
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
-        this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
-        this.fileChecker.start();
+        //geef ook discoveryNode mee
+        //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
+        //this.fileChecker.start();
 
     }
     @Override
