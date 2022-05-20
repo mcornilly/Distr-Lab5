@@ -107,7 +107,7 @@ public class FileManager extends Thread {
                     this.startup = false;
                     this.sendFiles = false;
                 }
-                else if(this.update) {
+                if(this.update) {
                     System.out.println("updatingggg");
                     this.localFiles = this.localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File

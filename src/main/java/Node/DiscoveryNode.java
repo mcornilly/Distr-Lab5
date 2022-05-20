@@ -239,6 +239,8 @@ public class DiscoveryNode extends Thread {
                             //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
                             this.fileManager.setUpdate(true);
                             this.fileManager.setSendFiles(true);
+                            System.out.println(this.fileManager.isSendFiles());
+                            System.out.println(this.fileManager.isUpdate());
 
                         } else if (hash < getCurrentID() && (getPreviousID() < hash || getPreviousID() == getCurrentID())) {
                             setPreviousID(hash);
@@ -248,7 +250,9 @@ public class DiscoveryNode extends Thread {
                             //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
 
                             this.fileManager.setUpdate(true);
+                            System.out.println(this.fileManager.isSendFiles());
                             this.fileManager.setSendFiles(true);
+                            System.out.println(this.fileManager.isUpdate());
 
                         } else {
                             response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
