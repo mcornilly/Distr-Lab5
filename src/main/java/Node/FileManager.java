@@ -45,7 +45,7 @@ public class FileManager extends Thread {
         System.out.println(launchDirectory);
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         System.out.println(this.localFolder);
-        this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
+        this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles/");
         this.localFiles = this.localFolder.listFiles();
         System.out.println(Arrays.toString(this.localFiles));
         //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles");
