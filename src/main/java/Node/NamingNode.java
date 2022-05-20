@@ -101,8 +101,6 @@ public class NamingNode {
             return;
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
-        DiscoveryNode discoveryNode = new DiscoveryNode(name, node);
-        discoveryNode.start();
         new PingNode(node).start();
         //FileManager fileManager = new FileManager(node);
         //fileManager.start();
