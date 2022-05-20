@@ -107,12 +107,8 @@ public class FileManager extends Thread {
                     this.startup = false;
                     this.sendFiles = false;
                 }
-                else if(sendFiles && update) {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                else if(this.update) {
+                    System.out.println("updatingggg");
                     this.localFiles = this.localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File
                         try {
