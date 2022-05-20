@@ -26,8 +26,7 @@ public class NamingNode {
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
         this.name = name;
         //start discovery
-        this.discoveryNode = new DiscoveryNode(name, this);
-        this.discoveryNode.start();
+
 
     }
     public String getFile(String filename) {
@@ -100,6 +99,8 @@ public class NamingNode {
             return;
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
+        DiscoveryNode discoveryNode = new DiscoveryNode(name, node);
+        discoveryNode.start();
         new PingNode(node).start();
         //FileManager fileManager = new FileManager(node);
         //fileManager.start();

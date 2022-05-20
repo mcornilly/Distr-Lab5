@@ -30,7 +30,9 @@ public class DiscoveryNode extends Thread {
     private int nextID; //ID of the next node
     private String name; //name of the current node
     private final NamingNode node; //NamingNode
-    private final FileManager fileManager;
+    //private final FileManager fileManager;
+    private final FileSend fileSend;
+    private final FileReceive fileReceive;
     private volatile boolean discoveryPhase;
     private int previousAnswer;
     private int nextAnswer;
@@ -160,8 +162,12 @@ public class DiscoveryNode extends Thread {
             System.out.println("Something went wrong during construction of DiscoveryNode");
             e.printStackTrace();
         }
-        this.fileManager = new FileManager(this.node, this);
-        this.fileManager.start();
+        this.fileReceive = new FileReceive(this.node, this);
+        //this.fileReceive.start();
+        this.fileSend = new FileSend(this.node, this);
+        this.fileSend.start();
+        //this.fileManager = new FileManager(this.node, this);
+        //this.fileManager.start();
 
     }
     @Override
@@ -237,10 +243,10 @@ public class DiscoveryNode extends Thread {
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                             //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
-                            this.fileManager.setUpdate(true);
-                            this.fileManager.setSendFiles(true);
-                            System.out.println(this.fileManager.isSendFiles());
-                            System.out.println(this.fileManager.isUpdate());
+                            this.fileSend.setUpdate(true);
+                            this.fileSend.setSendFiles(true);
+                            System.out.println(this.fileSend.isSendFiles());
+                            System.out.println(this.fileSend.isUpdate());
 
                         } else if (hash < getCurrentID() && (getPreviousID() < hash || getPreviousID() == getCurrentID())) {
                             setPreviousID(hash);
@@ -249,10 +255,10 @@ public class DiscoveryNode extends Thread {
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                             //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
 
-                            this.fileManager.setUpdate(true);
-                            System.out.println(this.fileManager.isSendFiles());
-                            this.fileManager.setSendFiles(true);
-                            System.out.println(this.fileManager.isUpdate());
+                            this.fileSend.setUpdate(true);
+                            this.fileSend.setSendFiles(true);
+                            System.out.println(this.fileSend.isUpdate());
+                            System.out.println(this.fileSend.isSendFiles());
 
                         } else {
                             response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
