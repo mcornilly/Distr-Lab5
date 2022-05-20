@@ -57,7 +57,7 @@ public class FileManager extends Thread {
         //Starting the FileManager
         while(this.node.discoveryNode.getNode().getRunning()) {  //while the node is running
             while(this.sendFiles) {
-                //System.out.println(this.node.discoveryNode.isDiscoveryPhase());
+                System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (!this.node.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     System.out.println(Arrays.toString(this.localFiles));
                     System.out.println("test");
