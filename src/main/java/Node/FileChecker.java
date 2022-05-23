@@ -49,7 +49,7 @@ public class FileChecker extends Thread {
                                 //System.out.println(
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
-                                FileManager.sendFile(file, this.fileLocation);
+                                FileSend.sendFile(file, this.fileLocation);
                                 System.out.println("Created File: " + file.getName());
                                 break;
                             case "ENTRY_DELETE":
@@ -58,7 +58,7 @@ public class FileChecker extends Thread {
                                 //System.out.println(
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
-                                FileManager.deleteFile(file, this.fileLocation);
+                                FileSend.deleteFile(file, this.fileLocation);
                                 System.out.println("Deleted File: " + file.getName());
                                 break;
                         }

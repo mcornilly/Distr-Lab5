@@ -1,3 +1,4 @@
+/*
 package Node;
 
 import Node.NamingNode;
@@ -222,3 +223,6 @@ public class FileManager extends Thread {
 
     }
 }
+
+
+ */

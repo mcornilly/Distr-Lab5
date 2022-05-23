@@ -163,7 +163,7 @@ public class DiscoveryNode extends Thread {
             e.printStackTrace();
         }
         this.fileReceive = new FileReceive(this.node, this);
-        //this.fileReceive.start();
+        this.fileReceive.start();
         this.fileSend = new FileSend(this.node, this);
         this.fileSend.start();
         //this.fileManager = new FileManager(this.node, this);
@@ -322,7 +322,7 @@ public class DiscoveryNode extends Thread {
                     String sender = ((JSONObject) obj).get("sender").toString();
                     String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
                     String location = ((JSONObject) obj).get("location").toString(); //get the location where the new file is
-                    FileManager.getSentFiles().replace(filename, location); //update our local mapping
+                    FileSend.getSentFiles().replace(filename, location); //update our local mapping
                 }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();

@@ -85,66 +85,8 @@ public class FileReceive extends Thread{
     }
     @Override
     public void run(){
-        //Starting the FileManager
-        //what if a node is added? maybe here in filemanager or filechecker another function
+        //Starting receiving
         while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
-            while(this.sendFiles) {
-                // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
-                if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
-                    //System.out.println(Arrays.toString(this.localFiles));
-                    System.out.println("Distribute all our LocalFiles at startup");
-                    for (File f : this.localFiles) { // for every local File
-                        try {
-                            System.out.println("Filename:" + f.getName()); //print out the name
-                            String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                            sendFile(f, fileLocation);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    this.startup = false;
-                    this.sendFiles = false;
-                }
-                if(this.update) {
-                    System.out.println("updatingggg");
-                    this.localFiles = this.localFolder.listFiles();
-                    for (File f : this.localFiles) { // for every local File
-                        try {
-                            if (!sentFiles.containsKey(f.getName())) //If the file is not in the shared lists so we still have it ourselves, check if we need to send it
-                            {
-                                System.out.println("Filename:" + f.getName()); //print out the name
-                                String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                                sendFile(f, fileLocation);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    this.replicatedFiles = this.replicatedFolder.listFiles(); //update to most recent
-                    for (File f : this.replicatedFiles){ //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
-                        try {
-                            System.out.println("Filename:" + f.getName()); //print out the name
-                            String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                            boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
-                            if (transfer){
-                                //sent message that the file is updated to the local owner
-                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.discoveryNode.getCurrentID() + ","
-                                        + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
-                                DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
-                                this.discoveryNode.getAnswerSocket().send(updateFile); //sent the packet
-                                receivedFiles.remove(f.getName()); //remove from our receivedfiles map
-                                f.delete(); //delete the file in replicated folder because we  sent it to the right owner
-                            }
-                        } catch (Exception e){
-
-                        }
-                    }
-                    //for sending files when we get a new neighbour, check all of our localfiles and replicatedFiles if we need to pass them on to this new neighbour
-                    //send replicated file to its new owner
-                    this.update = false;
-                    this.sendFiles = false;
-                }
-            }
             try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
                 while(!this.sendFiles) { //while we are not sending anymore
                     Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
@@ -178,44 +120,7 @@ public class FileReceive extends Thread{
         receivedFiles.put(fileName, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
     }
-    static boolean sendFile(File file, String fileLocation) throws Exception{
-        if (!fileLocation.equals("Error")) {
-            JSONParser parser = new JSONParser();
-            try {
-                Object obj = parser.parse(fileLocation);
-                int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
-                //System.out.println("Sending to: " + InetAddress.getLocalHost().getHostAddress());
-                String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
-                if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
-                    try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), 5000)) {
-                        //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
-                        dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
-                        int bytes = 0;
-                        FileInputStream fileInputStream = new FileInputStream(file);
-                        dataOutputStream.writeUTF(file.getName());
-                        dataOutputStream.flush();
-                        dataOutputStream.writeLong(file.length());
-                        byte[] buffer = new byte[4 * 1024];
-                        while ((bytes = fileInputStream.read(buffer)) != -1) {
-                            dataOutputStream.write(buffer, 0, bytes);
-                            dataOutputStream.flush();
-                        }
-                        fileInputStream.close();
-                    }catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    sentFiles.put(file.getName(), locationIP);
-                    System.out.println("File was sent to: " + locationIP);
-                }
-                System.out.println("sentFiles log: " + sentFiles);
-                return !locationIP.equals(InetAddress.getLocalHost().getHostAddress());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
-        }
-        return false;
-    }
     static void deleteFile(File file, String fileLocation) { //
 
     }

@@ -86,7 +86,7 @@ public class FileSend extends Thread {
         //Starting the FileManager
         //what if a node is added? maybe here in filemanager or filechecker another function
         while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
-            while(this.sendFiles) {
+            while (this.sendFiles) {
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));
@@ -103,7 +103,7 @@ public class FileSend extends Thread {
                     this.startup = false;
                     this.sendFiles = false;
                 }
-                if(this.update) {
+                if (this.update) {
                     System.out.println("updatingggg");
                     this.localFiles = this.localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File
@@ -119,12 +119,12 @@ public class FileSend extends Thread {
                         }
                     }
                     this.replicatedFiles = this.replicatedFolder.listFiles(); //update to most recent
-                    for (File f : this.replicatedFiles){ //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
+                    for (File f : this.replicatedFiles) { //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
                         try {
                             System.out.println("Filename:" + f.getName()); //print out the name
                             String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
                             boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
-                            if (transfer){
+                            if (transfer) {
                                 //sent message that the file is updated to the local owner
                                 String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.discoveryNode.getCurrentID() + ","
                                         + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
@@ -133,7 +133,7 @@ public class FileSend extends Thread {
                                 receivedFiles.remove(f.getName()); //remove from our receivedfiles map
                                 f.delete(); //delete the file in replicated folder because we  sent it to the right owner
                             }
-                        } catch (Exception e){
+                        } catch (Exception e) {
 
                         }
                     }
@@ -143,39 +143,10 @@ public class FileSend extends Thread {
                     this.sendFiles = false;
                 }
             }
-            try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
-                while(!this.sendFiles) { //while we are not sending anymore
-                    Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
-                    dataInputStream = new DataInputStream(sendingSocket.getInputStream());
-                    System.out.println(sendingSocket + " connected for receiving a file");
-                    String remoteIP = sendingSocket.getLocalAddress().getHostAddress();
-                    // System.out.println("IP" + remoteIP);
-                    receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
-                    //receivingSocket.close();
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+
         }
     }
     //Handling receive & send of files
-    private void receiveFile(String path, String remoteIP) throws Exception{
-        int bytes = 0;
-        String fileName = dataInputStream.readUTF();
-        FileOutputStream fileOutputStream = new FileOutputStream(path + "/" + fileName);
-        long size = dataInputStream.readLong();     // read file size
-        byte[] buffer = new byte[4*1024];
-        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
-            fileOutputStream.write(buffer,0,bytes);
-            size -= bytes;      // read upto file size
-        }
-        System.out.println("File received succesfully");
-        fileOutputStream.close();
-        this.replicatedFiles = this.replicatedFolder.listFiles();
-        //System.out.println(remoteIP);
-        receivedFiles.put(fileName, remoteIP);
-        System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
-    }
     static boolean sendFile(File file, String fileLocation) throws Exception{
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
