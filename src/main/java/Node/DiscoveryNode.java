@@ -242,23 +242,22 @@ public class DiscoveryNode extends Thread {
                             setNextIP(IP);
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
-                            //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
+                            //RECHECK OUR FILES FOLDER
                             this.fileSend.setUpdate(true);
                             this.fileSend.setSendFiles(true);
-                            System.out.println(this.fileSend.isSendFiles());
-                            System.out.println(this.fileSend.isUpdate());
+                            //System.out.println(this.fileSend.isSendFiles());
+                            //System.out.println(this.fileSend.isUpdate());
 
                         } else if (hash < getCurrentID() && (getPreviousID() < hash || getPreviousID() == getCurrentID())) {
                             setPreviousID(hash);
                             setPreviousIP(IP);
                             response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
-                            //RECHECK OUR LOCAL FILE FOLDER, but not instantly, maybe wait 2 seconds or so?
-
+                            //RECHECK OUR FILES FOLDER
                             this.fileSend.setUpdate(true);
                             this.fileSend.setSendFiles(true);
-                            System.out.println(this.fileSend.isUpdate());
-                            System.out.println(this.fileSend.isSendFiles());
+                            //System.out.println(this.fileSend.isUpdate());
+                            //System.out.println(this.fileSend.isSendFiles());
 
                         } else {
                             response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +

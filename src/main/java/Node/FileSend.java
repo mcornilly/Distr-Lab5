@@ -74,9 +74,8 @@ public class FileSend extends Thread {
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
-        //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
-        //this.fileChecker.start();
-
+        this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
+        this.fileChecker.start();
     }
     @Override
     public void run(){
@@ -101,7 +100,7 @@ public class FileSend extends Thread {
                     this.sendFiles = false;
                 }
                 if (this.update) {
-                    System.out.println("updatingggg");
+                    System.out.println("updating our local and replicated files because there is a new node in the system");
                     this.localFiles = this.localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File
                         try {
