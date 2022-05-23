@@ -320,8 +320,8 @@ public class DiscoveryNode extends Thread {
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID");
-                        String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
-                        String location = ((JSONObject) obj).get("location").toString(); //get the location where the new file is
+                        String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
+                        String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
                         FileSend.getSentFiles().replace(filename, location); //update our local mapping
                     }
                 }if(status.equals("DeleteFile")){
@@ -329,7 +329,7 @@ public class DiscoveryNode extends Thread {
                         System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
-                        String folder = ((JSONObject) obj).get("folder").toString();
+                        String folder = (String) ((JSONObject) obj).get("folder");
                         FileSend.deleteFile(filename, folder);
 
                     }
