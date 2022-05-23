@@ -38,7 +38,7 @@ public class FileChecker extends Thread {
             WatchKey key;
             while (this.node.discoveryNode.getNode().getRunning()) {
                 while ((key = watchService.take()) != null) {
-                    Thread.sleep(200);
+                    Thread.sleep(500);
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
                         switch (event.kind().toString()) {
@@ -49,8 +49,9 @@ public class FileChecker extends Thread {
                                 //System.out.println(
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
-                                FileSend.sendFile(file, this.fileLocation);
+                                System.out.println(file);
                                 System.out.println("Created File: " + file.getName());
+                                FileSend.sendFile(file, this.fileLocation);
                                 break;
                             case "ENTRY_DELETE":
                                 System.out.println(file.getName()); //print out the name
@@ -58,8 +59,8 @@ public class FileChecker extends Thread {
                                 //System.out.println(
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
-                                FileSend.deleteFile(file, this.fileLocation);
                                 System.out.println("Deleted File: " + file.getName());
+                                FileSend.deleteFile(file, this.fileLocation);
                                 break;
                         }
                     }
