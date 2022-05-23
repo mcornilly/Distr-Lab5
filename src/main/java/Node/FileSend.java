@@ -211,6 +211,8 @@ public class FileSend extends Thread {
                             "\"filename\":" + "\"" + file.getName() + "\"" + "," +  "\"folder\":\"replicated\"" + "}";
                     DatagramPacket delete = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(locationIP), 8001); // In Discovery node nog antwoord krijgen
                     responseSocket.send(delete);
+                    getSentFiles().remove(file.getName());  //remove this sent files from our log, we have a log with
+                    // where our local files are replicated and where our replicated files come from
                     }
             } catch (Exception e) {
                 e.printStackTrace();
