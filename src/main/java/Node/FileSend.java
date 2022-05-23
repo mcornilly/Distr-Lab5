@@ -62,7 +62,6 @@ public class FileSend extends Thread {
     private File[] replicatedFiles;
     private FileChecker fileChecker;
     private static DatagramSocket responseSocket;
-    private static int currentID;
 
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
@@ -75,7 +74,6 @@ public class FileSend extends Thread {
         this.update = false;
         //for deleting a file
         responseSocket = discoveryNode.getAnswerSocket();
-        currentID = discoveryNode.getCurrentID();
 
         String launchDirectory = System.getProperty("user.dir");
         localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
@@ -133,7 +131,7 @@ public class FileSend extends Thread {
                             boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
                             if (transfer) {
                                 //sent message that the file is updated to the local owner
-                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + currentID + ","
+                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.discoveryNode.getCurrentID() + ","
                                         + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
                                 DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
                                 responseSocket.send(updateFile); //sent the packet
@@ -209,8 +207,8 @@ public class FileSend extends Thread {
                     //tell owner to delete it, maybe with UDP message?
                     //udp to discoverynode, where we handle it
                     String response;
-                    response = "{\"status\":\"DeleteFile\","  + "\"senderID\":" + currentID + "," +
-                            "\"filename\":" + "\"" + file.getName() + "\"" + "\"folder\":\"replicated\"" + "}";
+                    response = "{\"status\":\"DeleteFile\","  +
+                            "\"filename\":" + "\"" + file.getName() + "\"" + "," +  "\"folder\":\"replicated\"" + "}";
                     DatagramPacket delete = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(locationIP), 8001); // In Discovery node nog antwoord krijgen
                     responseSocket.send(delete);
                     }
