@@ -120,8 +120,5 @@ public class FileReceive extends Thread{
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
     }
 
-    static void deleteFile(File file, String fileLocation) { //
-
-    }
 }
 
