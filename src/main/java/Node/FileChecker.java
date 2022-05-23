@@ -1,6 +1,8 @@
 package Node;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Arrays;
@@ -17,12 +19,14 @@ public class FileChecker extends Thread {
     private final WatchService watchService;
     private final Path path;
     private String fileLocation;
+    private File localFolder;
 
     public FileChecker(NamingNode node, String localDirectory) throws IOException {
         this.node = node;
         this.path = Paths.get(localDirectory);
         System.out.println(this.path.toString());
         this.watchService = FileSystems.getDefault().newWatchService();
+        this.localFolder = new File(localDirectory); //All localfiles
     }
 
 
@@ -41,6 +45,9 @@ public class FileChecker extends Thread {
                     Thread.sleep(500);
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
+                        FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
+                        File[] localFiles = this.localFolder.listFiles(filenameFilter);
+                        System.out.println(Arrays.toString(localFiles));
                         switch (event.kind().toString()) {
                             case "ENTRY_CREATE":
                                 System.out.println(file.getName()); //print out the name
@@ -49,7 +56,7 @@ public class FileChecker extends Thread {
                                 //System.out.println(
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
-                                System.out.println(file);
+
                                 System.out.println("Created File: " + file.getName());
                                 FileSend.sendFile(file, this.fileLocation);
                                 break;
