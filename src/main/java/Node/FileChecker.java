@@ -68,7 +68,7 @@ public class FileChecker extends Thread {
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
                                 System.out.println("Deleted File: " + file.getName());
-                                FileSend.deleteFile(file, this.fileLocation);
+                                FileSend.deleteMessage(file, this.fileLocation);
                                 break;
                         }
                     }

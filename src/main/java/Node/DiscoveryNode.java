@@ -316,12 +316,23 @@ public class DiscoveryNode extends Thread {
                         }
                     }
                 }if(status.equals("UpdateFile")){ //if the file location was updated for one of our local files
-                    System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                    System.out.println("received data: " + receivedData);
-                    String sender = ((JSONObject) obj).get("sender").toString();
-                    String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
-                    String location = ((JSONObject) obj).get("location").toString(); //get the location where the new file is
-                    FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                    if(!s1.equals(s2)) {
+                        System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("received data: " + receivedData);
+                        int senderID = (int) (long) ((JSONObject) obj).get("senderID");
+                        String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
+                        String location = ((JSONObject) obj).get("location").toString(); //get the location where the new file is
+                        FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                    }
+                }if(status.equals("DeleteFile")){
+                    if(!s1.equals(s2)) {
+                        System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("received data: " + receivedData);
+                        int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
+                        String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
+                        FileSend.deleteFile(filename);
+
+                    }
                 }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();

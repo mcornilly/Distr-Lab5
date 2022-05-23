@@ -2,6 +2,7 @@ package Node;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.*;
@@ -57,31 +58,41 @@ public class FileSend extends Thread {
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
     private File localFolder;
-    private File replicatedFolder;
+    private static File replicatedFolder;
     private File[] replicatedFiles;
-    FileChecker fileChecker;
+    private FileChecker fileChecker;
+    private static DatagramSocket responseSocket;
+    private static int currentID;
+
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
     public FileSend(NamingNode node, DiscoveryNode discoveryNode) throws IOException {
+        //startup
         this.node = node;
         this.discoveryNode = discoveryNode;
         this.startup = true;
         this.sendFiles = true;
         this.update = false;
+        //for deleting a file
+        responseSocket = discoveryNode.getAnswerSocket();
+        currentID = discoveryNode.getCurrentID();
+
         String launchDirectory = System.getProperty("user.dir");
-        //System.out.println(launchDirectory);
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
-        this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
+        replicatedFolder = new File(launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
+
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
         this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
         this.fileChecker.start();
+
     }
+
     @Override
-    public void run(){
+    public void run() {
         //Starting the FileManager
         //what if a node is added? maybe here in filemanager or filechecker another function
-        while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
+        while (this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
             while (this.sendFiles) {
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
@@ -122,10 +133,10 @@ public class FileSend extends Thread {
                             boolean transfer = sendFile(f, fileLocation); //transfer = true if the files was sent
                             if (transfer) {
                                 //sent message that the file is updated to the local owner
-                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + this.discoveryNode.getCurrentID() + ","
+                                String update = "{\"status\":\"UpdateFile\"," + "\"senderID\":" + currentID + ","
                                         + "\"filename\":" + "\"" + f.getName() + "\"" + "," + "\"location\":" + "\"" + fileLocation + "\"" + "}";
                                 DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
-                                this.discoveryNode.getAnswerSocket().send(updateFile); //sent the packet
+                                responseSocket.send(updateFile); //sent the packet
                                 receivedFiles.remove(f.getName()); //remove from our receivedfiles map
                                 f.delete(); //delete the file in replicated folder because we  sent it to the right owner
                             }
@@ -142,8 +153,9 @@ public class FileSend extends Thread {
 
         }
     }
+
     //Handling receive & send of files
-    static boolean sendFile(File file, String fileLocation) throws Exception{
+    static boolean sendFile(File file, String fileLocation) throws Exception {
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
             try {
@@ -151,10 +163,10 @@ public class FileSend extends Thread {
                 int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
                 //System.out.println("Sending to: " + InetAddress.getLocalHost().getHostAddress());
                 String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
-                char localNumber = locationIP.charAt(locationIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
-                int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
-                if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
-                    try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), portNumber)) {
+                char localNumber = locationIP.charAt(locationIP.length() - 1); //get the last char --> for 192.168.6.2 this is 2
+                int portNumber = Integer.parseInt("500" + localNumber); // so this will be 5002 on 6.2, receive on this port
+                if (!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
+                    try (Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), portNumber)) {
                         //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
                         dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
                         int bytes = 0;
@@ -168,7 +180,7 @@ public class FileSend extends Thread {
                             dataOutputStream.flush();
                         }
                         fileInputStream.close();
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     sentFiles.put(file.getName(), locationIP);
@@ -183,8 +195,35 @@ public class FileSend extends Thread {
         }
         return false;
     }
-    static void deleteFile(File file, String fileLocation) { //
 
+     static void deleteMessage(File file, String fileLocation) { //
+        //tell owner to delete the file in his replicated folder
+        if (!fileLocation.equals("Error")) {
+            JSONParser parser = new JSONParser();
+            try {
+                Object obj = parser.parse(fileLocation);
+                int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
+                //System.out.println("Sending to: " + InetAddress.getLocalHost().getHostAddress());
+                String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
+                if (!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be deleted
+                    //tell owner to delete it, maybe with UDP message?
+                    //udp to discoverynode, where we handle it
+                    String response;
+                    response = "{\"status\":\"DeleteFile\","  + "\"senderID\":" + currentID + "," +
+                            "\"filename\":" + "\"" + file.getName() + "\"" + "}";
+                    DatagramPacket delete = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(locationIP), 8001); // In Discovery node nog antwoord krijgen
+                    responseSocket.send(delete);
+                    }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    static void deleteFile(String filename){
+        FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+        File[] replicatedFiles = replicatedFolder.listFiles(filenameFilter); //only get the affected file
+        System.out.println("Deleting replicated file: " + filename); //print out the name
+        replicatedFiles[0].delete(); //delete the file
     }
 }
 
