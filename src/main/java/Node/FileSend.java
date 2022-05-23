@@ -208,7 +208,7 @@ public class FileSend extends Thread {
                     //udp to discoverynode, where we handle it
                     String response;
                     response = "{\"status\":\"DeleteFile\","  +
-                            "\"filename\":" + "\"" + file.getName() + "\"" + "," +  "\"folder\":\"replicated\"" + "}";
+                            "\"filename\":\"" + file.getName() + "\"" + "," +  "\"folder\":\"replicated\"" + "}";
                     DatagramPacket delete = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(locationIP), 8001); // In Discovery node nog antwoord krijgen
                     responseSocket.send(delete);
                     getSentFiles().remove(file.getName());  //remove this sent files from our log, we have a log with
