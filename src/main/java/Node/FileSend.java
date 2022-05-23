@@ -4,10 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,8 +152,10 @@ public class FileSend extends Thread {
                 int locationID = (int) (long) ((JSONObject) obj).get("node ID"); // get ID where the file should be
                 //System.out.println("Sending to: " + InetAddress.getLocalHost().getHostAddress());
                 String locationIP = ((JSONObject) obj).get("node IP").toString(); // get IP where the file should be
+                char localNumber = locationIP.charAt(locationIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
+                int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
                 if(!locationIP.equals(InetAddress.getLocalHost().getHostAddress())) { // if the file should be transferred
-                    try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), 5000)) {
+                    try(Socket sendingSocket = new Socket(InetAddress.getByName(locationIP), portNumber)) {
                         //Socket sendingSocket = new Socket(InetAddress.getByName(IP), 5000);
                         dataOutputStream = new DataOutputStream(sendingSocket.getOutputStream());
                         int bytes = 0;

@@ -4,10 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,15 +66,11 @@ public class FileReceive extends Thread{
     public FileReceive(NamingNode node, DiscoveryNode discoveryNode) throws IOException {
         this.node = node;
         this.discoveryNode = discoveryNode;
-        this.startup = true;
-        this.sendFiles = true;
-        this.update = false;
         String launchDirectory = System.getProperty("user.dir");
         //System.out.println(launchDirectory);
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
-        System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
         //geef ook discoveryNode mee
         //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
         //this.fileChecker.start();
@@ -86,9 +79,16 @@ public class FileReceive extends Thread{
     @Override
     public void run(){
         //Starting receiving
+        String localIP = null; //open a diff port for every diff node
+        try {
+            localIP = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
+        int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
         while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
-            try(ServerSocket receivingSocket = new ServerSocket(5000)){ // Try connecting to port 5000 to start listening to clients
-                while(!this.sendFiles) { //while we are not sending anymore
+            try(ServerSocket receivingSocket = new ServerSocket(portNumber)){ // Try connecting to port 500x to start listening to client
                     Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                     dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                     System.out.println(sendingSocket + " connected for receiving a file");
@@ -96,7 +96,6 @@ public class FileReceive extends Thread{
                     // System.out.println("IP" + remoteIP);
                     receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                     //receivingSocket.close();
-                }
             } catch (Exception e){
                 e.printStackTrace();
             }
