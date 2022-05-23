@@ -57,7 +57,7 @@ public class FileSend extends Thread {
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
-    private File localFolder;
+    private static File localFolder;
     private static File replicatedFolder;
     private File[] replicatedFiles;
     private FileChecker fileChecker;
@@ -78,7 +78,7 @@ public class FileSend extends Thread {
         currentID = discoveryNode.getCurrentID();
 
         String launchDirectory = System.getProperty("user.dir");
-        this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
+        localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         replicatedFolder = new File(launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
 
@@ -112,7 +112,7 @@ public class FileSend extends Thread {
                 }
                 if (this.update) {
                     System.out.println("updating our local and replicated files because there is a new node in the system");
-                    this.localFiles = this.localFolder.listFiles();
+                    this.localFiles = localFolder.listFiles();
                     for (File f : this.localFiles) { // for every local File
                         try {
                             if (!sentFiles.containsKey(f.getName())) //If the file is not in the shared lists so we still have it ourselves, check if we need to send it
@@ -125,7 +125,7 @@ public class FileSend extends Thread {
                             e.printStackTrace();
                         }
                     }
-                    this.replicatedFiles = this.replicatedFolder.listFiles(); //update to most recent
+                    this.replicatedFiles = replicatedFolder.listFiles(); //update to most recent
                     for (File f : this.replicatedFiles) { //check every replicatedFile if we need to move is, and delete it ourselves and tell the local owner
                         try {
                             System.out.println("Filename:" + f.getName()); //print out the name
@@ -210,7 +210,7 @@ public class FileSend extends Thread {
                     //udp to discoverynode, where we handle it
                     String response;
                     response = "{\"status\":\"DeleteFile\","  + "\"senderID\":" + currentID + "," +
-                            "\"filename\":" + "\"" + file.getName() + "\"" + "}";
+                            "\"filename\":" + "\"" + file.getName() + "\"" + "\"folder\":\"replicated\"" + "}";
                     DatagramPacket delete = new DatagramPacket(response.getBytes(), response.length(), InetAddress.getByName(locationIP), 8001); // In Discovery node nog antwoord krijgen
                     responseSocket.send(delete);
                     }
@@ -219,11 +219,20 @@ public class FileSend extends Thread {
             }
         }
     }
-    static void deleteFile(String filename){
+    static void deleteFile(String filename, String folder){
         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
-        File[] replicatedFiles = replicatedFolder.listFiles(filenameFilter); //only get the affected file
-        System.out.println("Deleting replicated file: " + filename); //print out the name
-        replicatedFiles[0].delete(); //delete the file
+        if(folder.equals("replicated")) {
+            File[] replicatedFiles = replicatedFolder.listFiles(filenameFilter); //only get the affected file
+            System.out.println("Deleting replicated file: " + filename); //print out the name
+            assert replicatedFiles != null;
+            replicatedFiles[0].delete(); //delete the file
+        }
+        if(folder.equals("local")){
+            File[] localFiles = localFolder.listFiles(filenameFilter);
+            System.out.println("Deleting local file: " + filename);
+            assert localFiles != null;
+            localFiles[0].delete();
+        }
     }
 }
 

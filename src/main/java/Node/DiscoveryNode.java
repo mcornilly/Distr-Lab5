@@ -330,7 +330,8 @@ public class DiscoveryNode extends Thread {
                         System.out.println("received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         String filename = ((JSONObject) obj).get("filename").toString(); //get the filename that was updated
-                        FileSend.deleteFile(filename);
+                        String folder = ((JSONObject) obj).get("folder").toString();
+                        FileSend.deleteFile(filename, folder);
 
                     }
                 }
