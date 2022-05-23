@@ -47,7 +47,7 @@ public class FileChecker extends Thread {
                         File file = new File(event.context().toString()); //get the File affected
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
                         File[] localFiles = this.localFolder.listFiles(filenameFilter);
-                        System.out.println(Arrays.toString(localFiles));
+                        //System.out.println(Arrays.toString(localFiles));
                         switch (event.kind().toString()) {
                             case "ENTRY_CREATE":
                                 System.out.println(file.getName()); //print out the name
@@ -58,7 +58,7 @@ public class FileChecker extends Thread {
                                                 //+ ". File affected: " + event.context() + ".");
 
                                 System.out.println("Created File: " + file.getName());
-                                FileSend.sendFile(file, this.fileLocation);
+                                FileSend.sendFile(localFiles[0], this.fileLocation);
                                 break;
                             case "ENTRY_DELETE":
                                 System.out.println(file.getName()); //print out the name
@@ -67,7 +67,7 @@ public class FileChecker extends Thread {
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
                                 System.out.println("Deleted File: " + file.getName());
-                                FileSend.deleteFile(file, this.fileLocation);
+                                FileSend.deleteFile(localFiles[0], this.fileLocation);
                                 break;
                         }
                     }
