@@ -45,11 +45,12 @@ public class FileChecker extends Thread {
                     Thread.sleep(500);
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
-                        FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
-                        File[] localFiles = this.localFolder.listFiles(filenameFilter);
                         //System.out.println(Arrays.toString(localFiles));
                         switch (event.kind().toString()) {
                             case "ENTRY_CREATE":
+                                //get the file with the directory
+                                FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
+                                File[] localFiles = this.localFolder.listFiles(filenameFilter); //only get the affected file
                                 System.out.println(file.getName()); //print out the name
                                 this.fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
                                 //logfile?
@@ -67,7 +68,7 @@ public class FileChecker extends Thread {
                                         //"Event kind:" + event.kind()
                                                 //+ ". File affected: " + event.context() + ".");
                                 System.out.println("Deleted File: " + file.getName());
-                                FileSend.deleteFile(localFiles[0], this.fileLocation);
+                                FileSend.deleteFile(file, this.fileLocation);
                                 break;
                         }
                     }
