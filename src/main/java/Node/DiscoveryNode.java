@@ -329,9 +329,8 @@ public class DiscoveryNode extends Thread {
                         System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
-                        System.out.println(filename);
                         String folder = ((JSONObject) obj).get("folder").toString();
-                        //FileSend.deleteFile(filename, folder);
+                        FileSend.deleteFile(filename, folder);
 
                     }
                 }
