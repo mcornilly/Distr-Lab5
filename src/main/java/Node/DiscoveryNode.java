@@ -136,6 +136,7 @@ public class DiscoveryNode extends Thread {
     public NamingNode getNode() {
         return node;
     }
+    public FileSend getFileSend() { return fileSend;}
 
     public DiscoveryNode(String name, NamingNode node) throws IOException {
         this.node = node;
@@ -184,11 +185,11 @@ public class DiscoveryNode extends Thread {
                 Thread.sleep(1000);
 
                 getDiscoverySocket().send(sendPacket);
-                System.out.println("sent discovery packet to: " + sendPacket.getSocketAddress());
+                System.out.println("Sent discovery packet to: " + sendPacket.getSocketAddress());
                 getDiscoverySocket().receive(receivePacket); // receive a packet on this socket
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 System.out.println("Discovery Answer packet received from: " + receivePacket.getSocketAddress());
-                System.out.println("received data: " + receivedData);
+                System.out.println("    received data: " + receivedData);
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
@@ -271,7 +272,7 @@ public class DiscoveryNode extends Thread {
                 if(status.equals("Shutdown")){
                     if(!s1.equals(s2)) {
                         System.out.println("Shutdown Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        System.out.println("received data: " + receivedData);
+                        System.out.println("    received data: " + receivedData);
                         String sender = ((JSONObject) obj).get("sender").toString(); //get the sender, either nextNode or PreviousNode
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         if (sender.equals("nextNode")) { // If the sender is the next neighbour
@@ -295,7 +296,7 @@ public class DiscoveryNode extends Thread {
                 if(status.equals("FailureOK")){
                     if(!s1.equals(s2)) {
                         System.out.println("FailureOK package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        System.out.println("received data: " + receivedData);
+                        System.out.println("    received data: " + receivedData);
                         int removedID = (int) (long) ((JSONObject) obj).get("removedID"); //get removedID
                         setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
                         setNextIP((String) ((JSONObject) obj).get("nextIP"));
@@ -306,7 +307,7 @@ public class DiscoveryNode extends Thread {
                 }if(status.equals("Ping")){
                     if(!s1.equals(s2)) {
                         System.out.println("Ping package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        System.out.println("received data: " + receivedData);
+                        System.out.println("    received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         if (senderID == getPreviousID()){
                             setPreviousAnswer(0);
@@ -318,8 +319,7 @@ public class DiscoveryNode extends Thread {
                 }if(status.equals("UpdateFile")){ //if the file location was updated for one of our local files
                     if(!s1.equals(s2)) {
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        System.out.println("received data: " + receivedData);
-                        int senderID = (int) (long) ((JSONObject) obj).get("senderID");
+                        System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
                         String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
                         FileSend.getSentFiles().replace(filename, location); //update our local mapping
@@ -327,17 +327,22 @@ public class DiscoveryNode extends Thread {
                 }if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {
                         System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        System.out.println("received data: " + receivedData);
+                        System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
                         String folder = (String) ((JSONObject) obj).get("folder");
                         FileSend.deleteFile(filename, folder);
-
+                    }
+                }if(status.equals("ShutdownFile")){
+                    if(!s1.equals(s2)) {
+                        System.out.println("ShutdownFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("    received data: " + receivedData);
+                        String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that is being removed
+                        FileSend.deleteFile(filename, "replicated"); //remove the file since the original owner is gone
                     }
                 }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }
-
         }
 
     }
