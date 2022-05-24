@@ -91,11 +91,10 @@ public class FileReceive extends Thread{
         //Starting receiving
         String localIP = null; //open a diff port for every diff node
         ServerSocket receivingSocket = null;
-        int portNumber = 0;
         try {
             localIP = InetAddress.getLocalHost().getHostAddress();
             char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
-            portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
+            int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
             receivingSocket = new ServerSocket(portNumber);
         } catch (IOException e) {
             e.printStackTrace();
@@ -108,7 +107,7 @@ public class FileReceive extends Thread{
                 String remoteIP = sendingSocket.getInetAddress().getHostAddress();
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 receivingSocket.close();
-                receivingSocket = new ServerSocket(portNumber);
+
             } catch (Exception e){
                 e.printStackTrace();
             }
