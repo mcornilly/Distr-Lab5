@@ -1,5 +1,6 @@
 package Node;
 
+import org.apache.catalina.Server;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -89,16 +90,17 @@ public class FileReceive extends Thread{
     public void run(){
         //Starting receiving
         String localIP = null; //open a diff port for every diff node
+        ServerSocket receivingSocket = null;
         try {
             localIP = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
+            char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
+            int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
+            receivingSocket = new ServerSocket(portNumber);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
-        int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
         while(NamingNode.getRunning()) {  //while the node is running, issues with volatile
             try{ // Try connecting to port 500x to start listening to client
-                ServerSocket receivingSocket = new ServerSocket(portNumber);
                     Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                     dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                     System.out.println(sendingSocket + " connected for receiving a file");
