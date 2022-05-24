@@ -198,7 +198,7 @@ public class FileSend extends Thread {
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + f.getName() + "\""
                 + "," + "\"location\":" + "\"" + IP + "\"" + "}";
-        System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
+        //System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
         DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(f.getName())), 8001);
         responseSocket.send(updateFile); //sent the packet
         FileReceive.getReceivedFiles().remove(f.getName()); //remove from our receivedfiles map
@@ -256,7 +256,6 @@ public class FileSend extends Thread {
                 //Move replicated file to the previous node
                 sendFile(f, "{\"file\":" + "\"" + f.getName() + "\"" + "," + "\"node ID\":" + previousID + "," +
                         "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true);
-                updateMessage(f, this.discoveryNode.getPreviousIP());
             } catch (Exception e){
             }
         }
