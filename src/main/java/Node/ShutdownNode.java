@@ -49,6 +49,7 @@ public class ShutdownNode extends Thread{
             ShutdownFileMessage(); //message of shutdown to file owners
             NamingNode.setRunning(false);
             FileReceive.currentThread().interrupt();
+            FileReceive.teardown();
 
         } catch (IOException e) {
             e.printStackTrace();

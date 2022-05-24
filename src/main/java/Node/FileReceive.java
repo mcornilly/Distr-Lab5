@@ -61,7 +61,7 @@ public class FileReceive extends Thread{
     private File localFolder;
     private File replicatedFolder;
     private File[] replicatedFiles;
-    private ServerSocket receivingSocket;
+    private static ServerSocket receivingSocket;
 
     public static HashMap<String, String> getReceivedFiles() {
         return receivedFiles;
@@ -89,7 +89,7 @@ public class FileReceive extends Thread{
         }
         char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
         int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
-        this.receivingSocket = new ServerSocket(portNumber);
+        receivingSocket = new ServerSocket(portNumber);
         //geef ook discoveryNode mee
         //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
         //this.fileChecker.start();
@@ -108,7 +108,7 @@ public class FileReceive extends Thread{
         int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
         while(NamingNode.getRunning()) {  //while the node is running, issues with volatile
             try{ // Try connecting to port 500x to start listening to client
-                Socket sendingSocket = this.receivingSocket.accept(); //try accepting sockets
+                Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                 dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                 System.out.println(sendingSocket + " connected for receiving a file");
                 String remoteIP = sendingSocket.getInetAddress().getHostAddress();
@@ -120,8 +120,8 @@ public class FileReceive extends Thread{
         }
     }
 
-    public void teardown() throws IOException {
-        this.receivingSocket.close();
+    public static void teardown() throws IOException {
+        receivingSocket.close();
     }
 
     //Handling receive & send of files
