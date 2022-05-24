@@ -181,6 +181,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), getBroadcastAddress(), 8001); //broadcast on port 8001
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (isDiscoveryPhase() && NamingNode.getRunning()) { // send a datagram packet until everyone answers
+            System.out.println(NamingNode.getRunning());
             try {
                 Thread.sleep(1000);
                 getDiscoverySocket().send(sendPacket);
