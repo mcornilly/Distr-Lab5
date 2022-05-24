@@ -50,6 +50,7 @@ public class ShutdownNode extends Thread{
             NamingNode.setRunning(false);
             //FileReceive.currentThread().interrupt();
             FileReceive.teardown();
+            FileChecker.teardown();
 
         } catch (IOException e) {
             e.printStackTrace();

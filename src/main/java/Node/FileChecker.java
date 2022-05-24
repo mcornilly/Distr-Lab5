@@ -16,7 +16,7 @@ We do this with a WatchService for our LocalFiles directory
 
 public class FileChecker extends Thread {
     private final NamingNode node;
-    private final WatchService watchService;
+    private static WatchService watchService;
     private final Path path;
     private String fileLocation;
     private File localFolder;
@@ -25,7 +25,7 @@ public class FileChecker extends Thread {
         this.node = node;
         this.path = Paths.get(localDirectory);
         System.out.println(this.path.toString());
-        this.watchService = FileSystems.getDefault().newWatchService();
+        watchService = FileSystems.getDefault().newWatchService();
         this.localFolder = new File(localDirectory); //All localfiles
     }
 
@@ -41,8 +41,6 @@ public class FileChecker extends Thread {
                     StandardWatchEventKinds.ENTRY_MODIFY);
             WatchKey key;
             while ((key = watchService.take()) != null && NamingNode.getRunning()) {
-                while (NamingNode.getRunning()) {
-                    System.out.println(NamingNode.getRunning());
                     Thread.sleep(500);
                     for (WatchEvent<?> event : key.pollEvents()) {
                         File file = new File(event.context().toString()); //get the File affected
@@ -75,10 +73,11 @@ public class FileChecker extends Thread {
                     }
                     key.reset();
                 }
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public static void teardown() throws IOException {
+        watchService.close();
     }
 }
