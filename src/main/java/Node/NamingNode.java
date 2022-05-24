@@ -104,7 +104,7 @@ public class NamingNode {
         new PingNode(node).start();
         //FileManager fileManager = new FileManager(node);
         //fileManager.start();
-        Thread.sleep(120000);
+        Thread.sleep(60000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
 
         //node.newNode(name, IP);

@@ -195,11 +195,12 @@ public class FileSend extends Thread {
         return false;
     }
 
-    static void updateMessage(File f, String IP) throws IOException {
+     static void updateMessage(File f, String IP) throws IOException {
         //tell owner of the file that we are moving the replicated file so he can keep track in his log
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + f.getName() + "\""
                 + "," + "\"location\":" + "\"" + IP + "\"" + "}";
+        System.out.println(receivedFiles.get(f.getName()));
         DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
         responseSocket.send(updateFile); //sent the packet
         receivedFiles.remove(f.getName()); //remove from our receivedfiles map
