@@ -63,7 +63,6 @@ public class FileSend extends Thread {
     private static File localFolder;
     private static File replicatedFolder;
     private File[] replicatedFiles;
-    private FileChecker fileChecker;
     private static FileReceive fileReceive;
     private static DatagramSocket responseSocket;
 
@@ -82,8 +81,8 @@ public class FileSend extends Thread {
         this.localFiles = localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
         replicatedFolder = new File(launchDirectory + "/src/main/resources/ReplicatedFiles");
-        this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
-        this.fileChecker.start();
+        FileChecker fileChecker = new FileChecker(this.node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
+        fileChecker.start();
         //start receiving files in different Thread.
         fileReceive = new FileReceive(this.node, this.discoveryNode);
         fileReceive.start();

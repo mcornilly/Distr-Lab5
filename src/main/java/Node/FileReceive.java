@@ -60,7 +60,6 @@ public class FileReceive extends Thread{
     private File localFolder;
     private File replicatedFolder;
     private File[] replicatedFiles;
-    FileChecker fileChecker;
 
     public static HashMap<String, String> getReceivedFiles() {
         return receivedFiles;
