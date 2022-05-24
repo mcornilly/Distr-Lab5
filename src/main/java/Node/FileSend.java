@@ -60,7 +60,25 @@ public class FileSend extends Thread {
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
     private File[] localFiles;
+
+    public static File getLocalFolder() {
+        return localFolder;
+    }
+
+    public static void setLocalFolder(File localFolder) {
+        FileSend.localFolder = localFolder;
+    }
+
     private static File localFolder;
+
+    public static File getReplicatedFolder() {
+        return replicatedFolder;
+    }
+
+    public static void setReplicatedFolder(File replicatedFolder) {
+        FileSend.replicatedFolder = replicatedFolder;
+    }
+
     private static File replicatedFolder;
     private File[] replicatedFiles;
     private static FileReceive fileReceive;
@@ -237,7 +255,9 @@ public class FileSend extends Thread {
             File[] replicatedFiles = replicatedFolder.listFiles(filenameFilter); //only get the affected file
             System.out.println("    Deleting replicated file: " + filename); //print out the name
             assert replicatedFiles != null;
+            FileReceive.getReceivedFiles().remove(filename);
             replicatedFiles[0].delete(); //delete the file
+
         }
         if(folder.equals("local")){
             File[] localFiles = localFolder.listFiles(filenameFilter);

@@ -16,7 +16,7 @@ public class NamingNode {
     public String name;
     private int hash;
     private static int previousID;
-    private boolean running;
+    private volatile boolean running;
     private int amount;
     private String nodes;
     DiscoveryNode discoveryNode;
@@ -104,7 +104,7 @@ public class NamingNode {
         new PingNode(node).start();
         //FileManager fileManager = new FileManager(node);
         //fileManager.start();
-        Thread.sleep(60000);
+        Thread.sleep(6000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
 
         //node.newNode(name, IP);

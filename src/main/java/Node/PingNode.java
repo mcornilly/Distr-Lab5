@@ -14,7 +14,7 @@ public class PingNode extends Thread{
     }
 
     public void run(){
-        while(namingNode.getRunning()){
+        while(this.namingNode.getRunning()){
             try {
                 Thread.sleep(5000); //sleep for 5 seconds
             } catch (InterruptedException e) {

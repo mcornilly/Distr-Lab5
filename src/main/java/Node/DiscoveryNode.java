@@ -5,6 +5,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -321,7 +322,15 @@ public class DiscoveryNode extends Thread {
                         System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
                         String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
-                        FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                        if(location.equals(InetAddress.getLocalHost().getHostAddress()) && currentID != previousID) { //If the location is ourselves, send the file further if possible
+                            FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+                            File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
+                            FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
+                                    "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true ); //send the file to the prev neighbour
+                            FileSend.getSentFiles().replace(filename, previousIP);
+                        }else {
+                            FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                        }
                     }
                 }if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {
@@ -339,7 +348,7 @@ public class DiscoveryNode extends Thread {
                         FileSend.deleteFile(filename, "replicated"); //remove the file since the original owner is gone
                     }
                 }
-            } catch (IOException | ParseException e) {
+            } catch (Exception e) {
                 //e.printStackTrace();
             }
         }

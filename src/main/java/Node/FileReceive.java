@@ -112,8 +112,8 @@ public class FileReceive extends Thread{
     //Handling receive & send of files
     private void receiveFile(String path, String remoteIP) throws Exception{
         int bytes = 0;
-        String fileName = dataInputStream.readUTF();
-        FileOutputStream fileOutputStream = new FileOutputStream(path + "/" + fileName);
+        String filename = dataInputStream.readUTF();
+        FileOutputStream fileOutputStream = new FileOutputStream(path + "/" + filename);
         long size = dataInputStream.readLong();     // read file size
         byte[] buffer = new byte[4*1024];
         while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
@@ -123,8 +123,7 @@ public class FileReceive extends Thread{
         System.out.println("File received succesfully");
         fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
-        //System.out.println(remoteIP);
-        receivedFiles.put(fileName, remoteIP);
+        receivedFiles.put(filename, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
     }
 
