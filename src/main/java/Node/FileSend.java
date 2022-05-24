@@ -182,9 +182,10 @@ public class FileSend extends Thread {
 
                     }
                     System.out.println("    File was sent to: " + locationIP);
+                    System.out.println("    sentFiles log: " + sentFiles);
                 }
 
-                System.out.println("    sentFiles log: " + sentFiles);
+
                 return !locationIP.equals(InetAddress.getLocalHost().getHostAddress());
             } catch (Exception e) {
                 e.printStackTrace();

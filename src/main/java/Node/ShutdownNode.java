@@ -57,9 +57,11 @@ public class ShutdownNode extends Thread{
     public void ShutdownFileMessage() throws IOException {
         // tell owners of the file that we are shutting down
         System.out.println("Telling owners of our local files we are shutting down");
+        System.out.println(this.sentfiles);
         Set<Map.Entry<String,String>> entries = this.sentfiles.entrySet();
         //for every entry in our sentfiles map (LOCAL for us), tell REPLICATED that we are shutting down
         for (Map.Entry<String, String> entry : entries) {
+            System.out.println("filename: " + entry.getKey() + ", with owner at: " + entry.getValue());
             String response;
             response = "{\"status\":\"ShutdownFile\","  + "\"senderID\":" + currentID + "," +
                      "\"filename\":" + "\"" + entry.getKey() + "\"" + "}";
