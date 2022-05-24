@@ -74,7 +74,7 @@ public class FileChecker extends Thread {
                     key.reset();
                 }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
     public static void teardown() throws IOException {
