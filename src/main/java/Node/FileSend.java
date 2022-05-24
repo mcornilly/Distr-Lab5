@@ -95,7 +95,7 @@ public class FileSend extends Thread {
         //fileChecker.start();
         //start receiving files in different Thread.
         fileReceive = new FileReceive(this.node, this.discoveryNode);
-        //fileReceive.start();
+        fileReceive.start();
     }
 
     @Override
