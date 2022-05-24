@@ -71,7 +71,7 @@ public class NamingNode {
             String url = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + hash;
             System.out.println(Unirest.delete(url).asString().getBody());
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
     public void printOut() throws UnknownHostException {

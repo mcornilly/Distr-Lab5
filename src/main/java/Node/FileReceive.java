@@ -96,7 +96,7 @@ public class FileReceive extends Thread{
         }
         char localNumber = localIP.charAt(localIP.length()-1); //get the last char --> for 192.168.6.2 this is 2
         int portNumber =  Integer.parseInt("500" +localNumber); // so this will be 5002 on 6.2, receive on this port
-        while(this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
+        while(this.node.getRunning()) {  //while the node is running, issues with volatile
             try(ServerSocket receivingSocket = new ServerSocket(portNumber)){ // Try connecting to port 500x to start listening to client
                     Socket sendingSocket = receivingSocket.accept(); //try accepting sockets
                     dataInputStream = new DataInputStream(sendingSocket.getInputStream());
