@@ -166,7 +166,7 @@ public class DiscoveryNode extends Thread {
         }
 
         this.fileSend = new FileSend(this.node, this);
-        this.fileSend.start();
+        //this.fileSend.start();
         //this.fileManager = new FileManager(this.node, this);
         //this.fileManager.start();
 

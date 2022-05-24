@@ -41,38 +41,40 @@ public class FileChecker extends Thread {
                     StandardWatchEventKinds.ENTRY_MODIFY);
             WatchKey key;
             while ((key = watchService.take()) != null && NamingNode.getRunning()) {
-                System.out.println(NamingNode.getRunning());
-                Thread.sleep(500);
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    File file = new File(event.context().toString()); //get the File affected
-                    //System.out.println(Arrays.toString(localFiles));
-                    switch (event.kind().toString()) {
-                        case "ENTRY_CREATE":
-                            //get the file with the directory
-                            FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
-                            File[] localFiles = this.localFolder.listFiles(filenameFilter); //only get the affected file
-                            System.out.println(file.getName()); //print out the name
-                            this.fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
-                            //logfile?
-                            //System.out.println(
-                            //"Event kind:" + event.kind()
-                            //+ ". File affected: " + event.context() + ".");
+                while (NamingNode.getRunning()) {
+                    System.out.println(NamingNode.getRunning());
+                    Thread.sleep(500);
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        File file = new File(event.context().toString()); //get the File affected
+                        //System.out.println(Arrays.toString(localFiles));
+                        switch (event.kind().toString()) {
+                            case "ENTRY_CREATE":
+                                //get the file with the directory
+                                FilenameFilter filenameFilter = (files, s) -> s.startsWith(file.getName());
+                                File[] localFiles = this.localFolder.listFiles(filenameFilter); //only get the affected file
+                                System.out.println(file.getName()); //print out the name
+                                this.fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
+                                //logfile?
+                                //System.out.println(
+                                //"Event kind:" + event.kind()
+                                //+ ". File affected: " + event.context() + ".");
 
-                            System.out.println("    Created File: " + file.getName());
-                            FileSend.sendFile(localFiles[0], this.fileLocation, false);
-                            break;
-                        case "ENTRY_DELETE":
-                            System.out.println(file.getName()); //print out the name
-                            this.fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
-                            //System.out.println(
-                            //"Event kind:" + event.kind()
-                            //+ ". File affected: " + event.context() + ".");
-                            System.out.println("    Deleted File: " + file.getName());
-                            FileSend.deleteMessage(file, this.fileLocation);
-                            break;
+                                System.out.println("    Created File: " + file.getName());
+                                FileSend.sendFile(localFiles[0], this.fileLocation, false);
+                                break;
+                            case "ENTRY_DELETE":
+                                System.out.println(file.getName()); //print out the name
+                                this.fileLocation = this.node.getFile(file.getName()); //get the location where the file should be
+                                //System.out.println(
+                                //"Event kind:" + event.kind()
+                                //+ ". File affected: " + event.context() + ".");
+                                System.out.println("    Deleted File: " + file.getName());
+                                FileSend.deleteMessage(file, this.fileLocation);
+                                break;
+                        }
                     }
+                    key.reset();
                 }
-                key.reset();
             }
 
         } catch (Exception e) {
