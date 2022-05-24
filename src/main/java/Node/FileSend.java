@@ -92,7 +92,7 @@ public class FileSend extends Thread {
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
         replicatedFolder = new File(launchDirectory + "/src/main/resources/ReplicatedFiles");
         FileChecker fileChecker = new FileChecker(this.node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
-        fileChecker.start();
+        //fileChecker.start();
         //start receiving files in different Thread.
         fileReceive = new FileReceive(this.node, this.discoveryNode);
         fileReceive.start();
