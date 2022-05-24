@@ -16,7 +16,7 @@ public class NamingNode {
     public String name;
     private int hash;
     private static int previousID;
-    private volatile boolean running;
+    private static volatile boolean running;
     private int amount;
     private String nodes;
     DiscoveryNode discoveryNode;

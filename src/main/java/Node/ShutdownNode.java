@@ -48,7 +48,7 @@ public class ShutdownNode extends Thread{
             this.node.discoveryNode.getFileSend().ShutdownFile(previousID, previousIP); //shutdown of files
             ShutdownFileMessage(); //message of shutdown to file owners
             this.node.setRunning(false);
-            System.out.println(this.node.getRunning());
+            //System.out.println(this.node.getRunning());
         } catch (IOException e) {
             e.printStackTrace();
         }
