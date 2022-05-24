@@ -51,7 +51,7 @@ public class FileSend extends Thread {
     public void setShutdown(boolean shutdown) { this.shutdown = shutdown; }
 
     private static HashMap<String, String> sentFiles = new HashMap<>(); //files we have shared (LOCAL --> REPLICATED)
-    private static HashMap<String, String> receivedFiles = new HashMap<>(); //files we are owner of (REPLICATED <-- LOCAL)
+    //private static HashMap<String, String> receivedFiles = new HashMap<>(); //files we are owner of (REPLICATED <-- LOCAL)
 
     private volatile boolean sendFiles;
     private boolean startup;
@@ -64,6 +64,7 @@ public class FileSend extends Thread {
     private static File replicatedFolder;
     private File[] replicatedFiles;
     private FileChecker fileChecker;
+    private static FileReceive fileReceive;
     private static DatagramSocket responseSocket;
 
     // Determines when to send or receive a file and where to send it to,
@@ -80,11 +81,12 @@ public class FileSend extends Thread {
         localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         this.localFiles = localFolder.listFiles();
         System.out.println("All LocalFiles at startup: " + Arrays.toString(this.localFiles));
-
         replicatedFolder = new File(launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
         this.fileChecker.start();
-
+        //start receiving files in different Thread.
+        fileReceive = new FileReceive(this.node, this.discoveryNode);
+        fileReceive.start();
     }
 
     @Override
@@ -200,10 +202,10 @@ public class FileSend extends Thread {
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + f.getName() + "\""
                 + "," + "\"location\":" + "\"" + IP + "\"" + "}";
-        System.out.println(receivedFiles.get(f.getName()));
-        DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(receivedFiles.get(f.getName())), 8001);
+        System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
+        DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(f.getName())), 8001);
         responseSocket.send(updateFile); //sent the packet
-        receivedFiles.remove(f.getName()); //remove from our receivedfiles map
+        FileReceive.getReceivedFiles().remove(f.getName()); //remove from our receivedfiles map
         f.delete(); //delete the file in replicated folder because we  sent it to the right owner
     }
 

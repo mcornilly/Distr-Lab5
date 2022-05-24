@@ -61,6 +61,15 @@ public class FileReceive extends Thread{
     private File replicatedFolder;
     private File[] replicatedFiles;
     FileChecker fileChecker;
+
+    public static HashMap<String, String> getReceivedFiles() {
+        return receivedFiles;
+    }
+
+    public static void setReceivedFiles(HashMap<String, String> receivedFiles) {
+        FileReceive.receivedFiles = receivedFiles;
+    }
+
     // Determines when to send or receive a file and where to send it to,
     //If we start a node, we want to send all our files to the respective
     public FileReceive(NamingNode node, DiscoveryNode discoveryNode) throws IOException {
@@ -71,6 +80,7 @@ public class FileReceive extends Thread{
         this.localFolder = new File(launchDirectory + "/src/main/resources/LocalFiles"); //All localfiles
         this.replicatedFolder = new File( launchDirectory + "/src/main/resources/ReplicatedFiles");
         this.localFiles = this.localFolder.listFiles();
+
         //geef ook discoveryNode mee
         //this.fileChecker = new FileChecker(node, launchDirectory + "/src/main/resources/LocalFiles"); //check local directory for changes
         //this.fileChecker.start();

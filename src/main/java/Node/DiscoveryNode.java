@@ -32,7 +32,7 @@ public class DiscoveryNode extends Thread {
     private final NamingNode node; //NamingNode
     //private final FileManager fileManager;
     private final FileSend fileSend;
-    private final FileReceive fileReceive;
+
     private volatile boolean discoveryPhase;
     private int previousAnswer;
     private int nextAnswer;
@@ -163,8 +163,7 @@ public class DiscoveryNode extends Thread {
             System.out.println("Something went wrong during construction of DiscoveryNode");
             e.printStackTrace();
         }
-        this.fileReceive = new FileReceive(this.node, this);
-        this.fileReceive.start();
+
         this.fileSend = new FileSend(this.node, this);
         this.fileSend.start();
         //this.fileManager = new FileManager(this.node, this);
