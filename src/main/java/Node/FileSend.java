@@ -24,13 +24,7 @@ public class FileSend extends Thread {
         FileSend.sentFiles = sentFiles;
     }
 
-    public boolean isSendFiles() {
-        return sendFiles;
-    }
 
-    public void setSendFiles(boolean sendFiles) {
-        this.sendFiles = sendFiles;
-    }
 
     public boolean isStartup() {
         return startup;
@@ -53,7 +47,6 @@ public class FileSend extends Thread {
     private static HashMap<String, String> sentFiles = new HashMap<>(); //files we have shared (LOCAL --> REPLICATED)
     //private static HashMap<String, String> receivedFiles = new HashMap<>(); //files we are owner of (REPLICATED <-- LOCAL)
 
-    private volatile boolean sendFiles;
     private boolean startup;
     private volatile boolean shutdown;
     private volatile boolean update;
@@ -90,7 +83,6 @@ public class FileSend extends Thread {
         this.node = node;
         this.discoveryNode = discoveryNode;
         this.startup = true;
-        this.sendFiles = true;
         this.update = false;
         this.shutdown = false;
         responseSocket = discoveryNode.getAnswerSocket();
@@ -111,7 +103,7 @@ public class FileSend extends Thread {
         //Starting the FileManager
         //what if a node is added? maybe here in filemanager or filechecker another function
         while (this.discoveryNode.getNode().getRunning()) {  //while the node is running, issues with volatile
-            while (this.sendFiles) {
+
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));
@@ -126,7 +118,6 @@ public class FileSend extends Thread {
                         }
                     }
                     this.startup = false;
-                    this.sendFiles = false;
                 }
                 if (this.update) {
                     System.out.println("updating our local and replicated files because there is a new node in the system");
@@ -155,13 +146,7 @@ public class FileSend extends Thread {
                     //for sending files when we get a new neighbour, check all of our localfiles and replicatedFiles if we need to pass them on to this new neighbour
                     //send replicated file to its new owner
                     this.update = false;
-                    this.sendFiles = false;
                 }
-                if (this.shutdown){
-
-                }
-            }
-
         }
     }
 

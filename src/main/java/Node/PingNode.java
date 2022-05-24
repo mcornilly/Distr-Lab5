@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 public class PingNode extends Thread{
-    private NamingNode namingNode;
+    private final NamingNode namingNode;
     public PingNode(NamingNode node){
         this.namingNode = node;
     }

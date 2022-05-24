@@ -183,7 +183,6 @@ public class DiscoveryNode extends Thread {
         while (isDiscoveryPhase() && getNode().getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
-
                 getDiscoverySocket().send(sendPacket);
                 System.out.println("Sent discovery packet to: " + sendPacket.getSocketAddress());
                 getDiscoverySocket().receive(receivePacket); // receive a packet on this socket
@@ -245,7 +244,6 @@ public class DiscoveryNode extends Thread {
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                             //RECHECK OUR FILES FOLDER
                             this.fileSend.setUpdate(true);
-                            this.fileSend.setSendFiles(true);
                             //System.out.println(this.fileSend.isSendFiles());
                             //System.out.println(this.fileSend.isUpdate());
 
@@ -256,7 +254,6 @@ public class DiscoveryNode extends Thread {
                                     "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                             //RECHECK OUR FILES FOLDER
                             this.fileSend.setUpdate(true);
-                            this.fileSend.setSendFiles(true);
                             //System.out.println(this.fileSend.isUpdate());
                             //System.out.println(this.fileSend.isSendFiles());
 
