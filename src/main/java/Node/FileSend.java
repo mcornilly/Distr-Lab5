@@ -102,7 +102,7 @@ public class FileSend extends Thread {
     public void run() {
         //Starting the FileManager
         //what if a node is added? maybe here in filemanager or filechecker another function
-        while (this.node.getRunning()) {  //while the node is running, issues with volatile
+        while (NamingNode.getRunning()) {  //while the node is running, issues with volatile
                 // System.out.println(this.node.discoveryNode.isDiscoveryPhase());
                 if (this.startup && !this.discoveryNode.isDiscoveryPhase()) { //if the node is out of the discovery phase
                     //System.out.println(Arrays.toString(this.localFiles));

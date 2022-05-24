@@ -82,10 +82,10 @@ public class NamingNode {
         System.out.println("Nodes:\t\t\t" + this.nodes);
         System.out.println("node hostname + IP : " + InetAddress.getLocalHost());
     }
-    public boolean getRunning(){
+    public static boolean getRunning(){
         return this.running;
     }
-    public void setRunning(boolean running){
+    public static void setRunning(boolean running){
         this.running = running;
     }
     public static void main(String[] args) throws IOException, InterruptedException {

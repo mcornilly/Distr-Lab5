@@ -180,7 +180,7 @@ public class DiscoveryNode extends Thread {
         String send = "{\"status\":\"Discovery\"," + "\"name\":" +"\"" + getNodeName() + "\"" + "}";
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), getBroadcastAddress(), 8001); //broadcast on port 8001
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
-        while (isDiscoveryPhase() && this.node.getRunning()) { // send a datagram packet until everyone answers
+        while (isDiscoveryPhase() && NamingNode.getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
                 getDiscoverySocket().send(sendPacket);
@@ -220,7 +220,8 @@ public class DiscoveryNode extends Thread {
                 // e.printStackTrace();
             }
         }
-        while(this.node.getRunning()) {
+        while(NamingNode.getRunning()) {
+
             try {
                 getAnswerSocket().receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString(); //IP of the sending node
