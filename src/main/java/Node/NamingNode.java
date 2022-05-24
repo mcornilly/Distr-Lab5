@@ -106,7 +106,6 @@ public class NamingNode {
         //fileManager.start();
         Thread.sleep(6000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
-        System.out.println(getRunning());
         //node.newNode(name, IP);
         //node.getNode(name);
         //node.printOut();

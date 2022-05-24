@@ -115,7 +115,7 @@ public class FileReceive extends Thread{
                 receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                 //receivingSocket.close();
             } catch (Exception e){
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
