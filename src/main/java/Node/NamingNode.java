@@ -22,7 +22,7 @@ public class NamingNode {
     DiscoveryNode discoveryNode;
 
     public NamingNode(String name) throws IOException { //constructor
-        this.running = true;
+        running = true;
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
         this.name = name;
         //start discovery
@@ -83,10 +83,10 @@ public class NamingNode {
         System.out.println("node hostname + IP : " + InetAddress.getLocalHost());
     }
     public static boolean getRunning(){
-        return this.running;
+        return running;
     }
-    public static void setRunning(boolean running){
-        this.running = running;
+    public static void setRunning(boolean running2){
+        running = running2;
     }
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Starting Node...");
