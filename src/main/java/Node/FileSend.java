@@ -180,13 +180,10 @@ public class FileSend extends Thread {
                         updateMessage(file, locationIP);
                     }else{
                         sentFiles.put(file.getName(), locationIP);
-
+                        System.out.println("    sentFiles log: " + sentFiles);
                     }
                     System.out.println("    File was sent to: " + locationIP);
-                    System.out.println("    sentFiles log: " + sentFiles);
                 }
-
-
                 return !locationIP.equals(InetAddress.getLocalHost().getHostAddress());
             } catch (Exception e) {
                 e.printStackTrace();

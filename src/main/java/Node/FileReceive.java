@@ -102,7 +102,8 @@ public class FileReceive extends Thread{
                     dataInputStream = new DataInputStream(sendingSocket.getInputStream());
                     System.out.println(sendingSocket + " connected for receiving a file");
                     String remoteIP = sendingSocket.getLocalAddress().getHostAddress();
-                    // System.out.println("IP" + remoteIP);
+                    System.out.println("IP" + remoteIP);
+                    System.out.println(sendingSocket.getInetAddress().getHostAddress());
                     receiveFile(this.replicatedFolder.toString(), remoteIP); //receive the file
                     //receivingSocket.close();
             } catch (Exception e){
