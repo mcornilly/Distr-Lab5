@@ -40,7 +40,7 @@ public class FileChecker extends Thread {
                     StandardWatchEventKinds.ENTRY_DELETE,
                     StandardWatchEventKinds.ENTRY_MODIFY);
             WatchKey key;
-            while (this.node.discoveryNode.getNode().getRunning()) {
+            while (this.node.getRunning()) {
                 while ((key = watchService.take()) != null) {
                     Thread.sleep(500);
                     for (WatchEvent<?> event : key.pollEvents()) {
