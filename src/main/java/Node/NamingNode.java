@@ -94,8 +94,10 @@ public class NamingNode {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("org.apache.http");
         root.setLevel(ch.qos.logback.classic.Level.OFF);
         String name;
-        if (args.length > 0) {
+        int time;
+        if (args.length > 1) {
             name = args[0];
+            time = Integer.parseInt(args[1]);
         } else {
             System.out.println("Please give a name to your node!");
             return;
@@ -104,7 +106,7 @@ public class NamingNode {
         new PingNode(node).start();
         //FileManager fileManager = new FileManager(node);
         //fileManager.start();
-        Thread.sleep(30000);
+        Thread.sleep(time);
         new ShutdownNode(node).start(); // start shutdown in different Thread
         //node.newNode(name, IP);
         //node.getNode(name);

@@ -7,4 +7,7 @@ public class ToHash {
         long min = -2147483648;
         return (int) (((long) string.hashCode() + max) * (32768.0 / (max + Math.abs(min))));
     }
+    public static void main(String[] args){
+        System.out.println(hash("bavo.txt"));
+    }
 }
