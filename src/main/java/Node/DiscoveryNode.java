@@ -312,9 +312,10 @@ public class DiscoveryNode extends Thread {
                     }
                 }if(status.equals("UpdateFile")) { //if the file location was updated for one of our local files
                     if (!s1.equals(s2) && !receivePacket.getAddress().toString().equals("/127.0.0.1")) {
-                        /*
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
+                    }
+                        /*
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
                         String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
@@ -345,6 +346,7 @@ public class DiscoveryNode extends Thread {
                         }
                     }
                     */
+                        /*
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
@@ -377,6 +379,7 @@ public class DiscoveryNode extends Thread {
                             System.out.println("only replicated");
                         }
                     }
+                         */
 
             } if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {

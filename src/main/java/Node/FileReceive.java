@@ -138,10 +138,16 @@ public class FileReceive extends Thread{
         System.out.println("File received succesfully");
         fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
+        FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+        File[] localFile = this.localFolder.listFiles(filenameFilter); //only get the affected file
+        File[] replicatedFile = this.replicatedFolder.listFiles(filenameFilter); //only get the affected file
 
         receivedFiles.put(filename, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
-
+        if(localFile[0].getName().equals(replicatedFile[0].getName())){
+            System.out.println("This is our local file, delete it");
+            replicatedFile[0].delete();
+        }
     }
 
 
