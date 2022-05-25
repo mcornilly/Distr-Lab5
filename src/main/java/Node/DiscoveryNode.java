@@ -312,6 +312,7 @@ public class DiscoveryNode extends Thread {
                     }
                 }if(status.equals("UpdateFile")) { //if the file location was updated for one of our local files
                     if (!s1.equals(s2) && !receivePacket.getAddress().toString().equals("/127.0.0.1")) {
+                        /*
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
@@ -321,6 +322,9 @@ public class DiscoveryNode extends Thread {
                         File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
                         System.out.println("Localfiles at update: " + localFile[0].getName());
                         System.out.println("Replicatedfiles at update: " + replicatedFile[0].getName());
+                        if(localFile[0] == null){
+
+                        }
                         if (location.equals(InetAddress.getLocalHost().getHostAddress()) && localFile != null && replicatedFile != null) { //If the location is ourselves, send the replicated file further if possible
                             FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
                                     "\"node IP\":" + "\"" + previousIP + "\"" + "}", true, true, previousIP); //send the file to the prev neighbour
@@ -340,7 +344,7 @@ public class DiscoveryNode extends Thread {
                             System.out.println("Forward update message");
                         }
                     }
-                        /*
+                    */
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
@@ -348,32 +352,31 @@ public class DiscoveryNode extends Thread {
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
                         File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter);
                         File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
-
-                        if (localFile != null && replicatedFile != null) { //if they both exist
+                        if (localFile[0] != null && replicatedFile[0] != null) { //if they both exist
                             //we have this file both locally and replicated, so we sent the file to our previous node
                             //delete the file locally and update our mapping
                             FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
-                                    "\"node IP\":" + "\"" + previousIP + "\"" + "}", true); //send the file to the prev neighbour
+                                    "\"node IP\":" + "\"" + previousIP + "\"" + "}", true, true, previousIP); //send the file to the prev neighbour
                             //FileSend.updateMessage(filename, location, true, previousIP); //also send an update message to the local owner
                             //FileReceive.getReceivedFiles().remove(filename);
                             //replicatedFile[0].delete();
                             FileSend.getSentFiles().replace(filename, previousIP);
                             System.out.println("The file message we just received is our local file, send the file to the previous node");
                         }
-                        if (localFile != null && replicatedFile == null) { //if we have the file locally, we just only received the message, update our mapping
+                        if (localFile[0] != null && replicatedFile[0] == null) { //if we have the file locally, we just only received the message, update our mapping
                             FileSend.getSentFiles().replace(filename, location);
                             System.out.println("only local");
                         }
-                        if (localFile == null && replicatedFile == null) { //if we don't have the file locally or replicated just forward the message
+                        if (localFile[0] == null && replicatedFile[0] == null) { //if we don't have the file locally or replicated just forward the message
                             FileSend.updateMessage(filename, location, true, previousIP);
                             System.out.println("not local and not replicated");
                         }
-                        if (localFile == null && replicatedFile != null) { //if we have the file only replicated, but not locally, forward the message
+                        if (localFile[0] == null && replicatedFile[0] != null) { //if we have the file only replicated, but not locally, forward the message
                             FileSend.updateMessage(filename, location, true, previousIP);
                             System.out.println("only replicated");
                         }
                         }
-                         */
+
             } if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {
                         System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
