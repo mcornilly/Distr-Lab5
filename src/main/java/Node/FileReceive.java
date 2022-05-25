@@ -125,30 +125,24 @@ public class FileReceive extends Thread{
     }
 
     //Handling receive & send of files
-    private void receiveFile(String path, String remoteIP) throws Exception{
+    private void receiveFile(String path, String remoteIP) throws Exception {
         int bytes = 0;
         String filename = dataInputStream.readUTF();
         FileOutputStream fileOutputStream = new FileOutputStream(path + "/" + filename);
         long size = dataInputStream.readLong();     // read file size
-        byte[] buffer = new byte[4*1024];
-        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
-            fileOutputStream.write(buffer,0,bytes);
+        byte[] buffer = new byte[4 * 1024];
+        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+            fileOutputStream.write(buffer, 0, bytes);
             size -= bytes;      // read upto file size
         }
         System.out.println("File received succesfully");
         fileOutputStream.close();
-        FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
-        File[] localFiles = this.localFolder.listFiles(filenameFilter); //only get the affected file
-        if (localFiles[0] == null){
-            this.replicatedFiles = this.replicatedFolder.listFiles();
-            receivedFiles.put(filename, remoteIP);
-            System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
-        } else {
-            if (localFiles[0].getName().equals(filename)) {
-                this.replicatedFolder.listFiles(filenameFilter)[0].delete();
-            }
-        }
+        this.replicatedFiles = this.replicatedFolder.listFiles();
+        receivedFiles.put(filename, remoteIP);
+        System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
+
     }
+
 
 }
 
