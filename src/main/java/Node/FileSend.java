@@ -179,7 +179,9 @@ public class FileSend extends Thread {
                         e.printStackTrace();
                     }
                     if(replication){
-                        updateMessage(file, locationIP);
+                        updateMessage(file.getName(), locationIP, false, "");
+                        FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
+                        file.delete(); //delete the file in replicated folder because we  sent it to the right owner
                     }else{
                         sentFiles.put(file.getName(), locationIP);
                         System.out.println("    sentFiles log: " + sentFiles);
@@ -195,16 +197,22 @@ public class FileSend extends Thread {
         return false;
     }
 
-     static void updateMessage(File f, String IP) throws IOException {
+     static void updateMessage(String filename, String IP, boolean localOwner, String previousIP) throws IOException {
         //tell owner of the file that we are moving the replicated file so he can keep track in his log
         //sent message that the file is updated to the local owner
-        String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + f.getName() + "\""
+        String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + filename + "\""
                 + "," + "\"location\":" + "\"" + IP + "\"" + "}";
         //System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
-        DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(f.getName())), 8001);
-        responseSocket.send(updateFile); //sent the packet
-        FileReceive.getReceivedFiles().remove(f.getName()); //remove from our receivedfiles map
-        f.delete(); //delete the file in replicated folder because we  sent it to the right owner
+         //
+        if(!localOwner) {
+            DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(filename)), 8001);
+            responseSocket.send(updateFile); //sent the packet
+        }else{
+            DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(previousIP), 8001);
+            responseSocket.send(updateFile); //sent the packet
+        }
+
+
     }
 
      static void deleteMessage(File file, String fileLocation) { //
