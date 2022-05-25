@@ -138,6 +138,7 @@ public class FileReceive extends Thread{
         System.out.println("File received succesfully");
         fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
+
         receivedFiles.put(filename, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
 
