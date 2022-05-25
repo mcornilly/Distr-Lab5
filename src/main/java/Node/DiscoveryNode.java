@@ -311,7 +311,7 @@ public class DiscoveryNode extends Thread {
                         }
                     }
                 }if(status.equals("UpdateFile")) { //if the file location was updated for one of our local files
-                    if (!s1.equals(s2)) {
+                    if (!s1.equals(s2) && !receivePacket.getAddress().toString().equals("/127.0.0.1")) {
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
