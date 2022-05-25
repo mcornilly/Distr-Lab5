@@ -139,7 +139,7 @@ public class FileReceive extends Thread{
         fileOutputStream.close();
         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
         File[] localFiles = this.localFolder.listFiles(filenameFilter); //only get the affected file
-        if (localFiles == null){
+        if (localFiles[0] == null){
             this.replicatedFiles = this.replicatedFolder.listFiles();
             receivedFiles.put(filename, remoteIP);
             System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
