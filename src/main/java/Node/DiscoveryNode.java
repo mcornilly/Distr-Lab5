@@ -319,6 +319,34 @@ public class DiscoveryNode extends Thread {
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
                         File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter);
                         File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
+                        if (location.equals(InetAddress.getLocalHost().getHostAddress()) && localFile != null && replicatedFile != null) { //If the location is ourselves, send the replicated file further if possible
+                            FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
+                                    "\"node IP\":" + "\"" + previousIP + "\"" + "}", true, true, previousIP); //send the file to the prev neighbour
+                            FileSend.getSentFiles().replace(filename, previousIP);
+                            System.out.println("The file we just received is our local file, send it to the previous node");
+                        } else if (location.equals(InetAddress.getLocalHost().getHostAddress()) && currentID == previousID) {
+                            replicatedFile[0].delete();
+                            FileSend.getSentFiles().remove(filename);
+                            System.out.println("The file we just received is our local file, but we are also our own previous node");
+                        } else if (localFile != null){
+                            //If we are local owner, but not replicated, update our local mapping
+                            FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                            System.out.println("Update local mapping");
+                        } else {
+                            //if we are not local owner and not replicated owner, just forward the updatemessage to previous noed
+                            FileSend.updateMessage(filename, location, true, previousIP);
+                            System.out.println("Forward update message");
+                        }
+                    }
+                        /*
+                        System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("    received data: " + receivedData);
+                        String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
+                        String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
+                        FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+                        File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter);
+                        File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
+
                         if (localFile != null && replicatedFile != null) { //if they both exist
                             //we have this file both locally and replicated, so we sent the file to our previous node
                             //delete the file locally and update our mapping
@@ -342,7 +370,8 @@ public class DiscoveryNode extends Thread {
                             FileSend.updateMessage(filename, location, true, previousIP);
                             System.out.println("only replicated");
                         }
-                    }
+                        }
+                         */
             } if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {
                         System.out.println("DeleteFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
@@ -360,7 +389,7 @@ public class DiscoveryNode extends Thread {
                     }
                 }
             } catch (Exception e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             }
         }
 

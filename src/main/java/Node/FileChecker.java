@@ -58,7 +58,7 @@ public class FileChecker extends Thread {
                                 //+ ". File affected: " + event.context() + ".");
 
                                 System.out.println("    Created File: " + file.getName());
-                                FileSend.sendFile(localFiles[0], this.fileLocation, false);
+                                FileSend.sendFile(localFiles[0], this.fileLocation, false, false, "");
                                 break;
                             case "ENTRY_DELETE":
                                 System.out.println(file.getName()); //print out the name

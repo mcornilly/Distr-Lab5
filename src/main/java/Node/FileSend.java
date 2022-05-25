@@ -111,7 +111,7 @@ public class FileSend extends Thread {
                         try {
                             System.out.println("    Filename:" + f.getName()); //print out the name
                             String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                            sendFile(f, fileLocation, false);
+                            sendFile(f, fileLocation, false, false, "");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -127,7 +127,7 @@ public class FileSend extends Thread {
                             {
                                 System.out.println("    Filename:" + f.getName()); //print out the name
                                 String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                                sendFile(f, fileLocation, false);
+                                sendFile(f, fileLocation, false, false, "");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -138,7 +138,7 @@ public class FileSend extends Thread {
                         try {
                             System.out.println("    Filename:" + f.getName()); //print out the name
                             String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
-                            sendFile(f, fileLocation, true); //transfer = true if the files was sent
+                            sendFile(f, fileLocation, true, false, ""); //transfer = true if the files was sent
                         } catch (Exception e) {
                         }
                     }
@@ -150,7 +150,7 @@ public class FileSend extends Thread {
     }
 
     //Handling receive & send of files
-    static boolean sendFile(File file, String fileLocation, boolean resending) throws Exception {
+    static boolean sendFile(File file, String fileLocation, boolean resending, boolean localOwner, String previousIP) throws Exception {
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
             try {
@@ -179,7 +179,7 @@ public class FileSend extends Thread {
                         e.printStackTrace();
                     }
                     if(resending){
-                        updateMessage(file.getName(), locationIP, false, "");
+                        updateMessage(file.getName(), locationIP, localOwner, previousIP);
                         FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
                         file.delete(); //delete the file in replicated folder because we  sent it to the right owner
                     }else{
@@ -267,7 +267,7 @@ public class FileSend extends Thread {
                 System.out.println("    Filename:" + f.getName()); //print out the name
                 //Move replicated file to the previous node
                 sendFile(f, "{\"file\":" + "\"" + f.getName() + "\"" + "," + "\"node ID\":" + previousID + "," +
-                        "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true);
+                        "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true, false, "");
             } catch (Exception e){
             }
         }
