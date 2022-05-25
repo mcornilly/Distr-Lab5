@@ -325,9 +325,19 @@ public class DiscoveryNode extends Thread {
                             FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
                                     "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true ); //send the file to the prev neighbour
                             FileSend.getSentFiles().replace(filename, previousIP);
-                        }else {
+                            System.out.println("The file we just received is our local file, send it to the previous node");
+
+                        }else if(location.equals(InetAddress.getLocalHost().getHostAddress()) && currentID == previousID) {
+                            FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+                            File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
+                            replicatedFile[0].delete();
+                            FileSend.getSentFiles().remove(filename);
+                            System.out.println("The file we just received is our local file, but we are also our own previous node");
+                        }
+                        else {
                             FileSend.getSentFiles().replace(filename, location); //update our local mapping
                         }
+
                     }
                 }if(status.equals("DeleteFile")){
                     if(!s1.equals(s2)) {
