@@ -319,24 +319,28 @@ public class DiscoveryNode extends Thread {
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
                         File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter);
                         File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
-                        if (localFile != null && replicatedFile != null) { //if we have this file ourselves both local and replicated
-                            if (currentID != previousID) { //if we have a previous neighbour, send him this file
-                                FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
-                                        "\"node IP\":" + "\"" + previousIP + "\"" + "}", true); //send the file to the prev neighbour
-                                FileSend.getSentFiles().replace(filename, previousIP);
-                                System.out.println("The file message we just received is our local file, send the file to the previous node");
-                            } else {
-                                replicatedFile[0].delete();
-                                FileSend.getSentFiles().remove(filename);
-                                System.out.println("The file we just received is our local file, but we are also our own previous node");
-                            }
-                        } else if (localFile != null) { //if we have this file locally, update our mapping
-                            FileSend.getSentFiles().replace(filename, location); //update our local mapping
-                            System.out.println("Updated our local mapping");
-                        } else {
-                            //if we don't have the file locally or only have it replicated, forward the updateMessage
-                            FileSend.updateMessage(replicatedFile[0].getName(), location, true, previousIP);
-                            System.out.println("Forward to message until it reaches the local owner");
+                        if (localFile != null && replicatedFile != null) { //if they both exist
+                            //we have this file both locally and replicated, so we sent the file to our previous node
+                            //delete the file locally and update our mapping
+                            FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
+                                    "\"node IP\":" + "\"" + previousIP + "\"" + "}", true); //send the file to the prev neighbour
+                            //FileSend.updateMessage(filename, location, true, previousIP); //also send an update message to the local owner
+                            //FileReceive.getReceivedFiles().remove(filename);
+                            //replicatedFile[0].delete();
+                            FileSend.getSentFiles().replace(filename, previousIP);
+                            System.out.println("The file message we just received is our local file, send the file to the previous node");
+                        }
+                        if (localFile != null && replicatedFile == null) { //if we have the file locally, we just only received the message, update our mapping
+                            FileSend.getSentFiles().replace(filename, location);
+                            System.out.println("only local");
+                        }
+                        if (localFile == null && replicatedFile == null) { //if we don't have the file locally or replicated just forward the message
+                            FileSend.updateMessage(filename, location, true, previousIP);
+                            System.out.println("not local and not replicated");
+                        }
+                        if (localFile == null && replicatedFile != null) { //if we have the file only replicated, but not locally, forward the message
+                            FileSend.updateMessage(filename, location, true, previousIP);
+                            System.out.println("only replicated");
                         }
                     }
             } if(status.equals("DeleteFile")){

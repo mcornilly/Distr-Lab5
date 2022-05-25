@@ -150,7 +150,7 @@ public class FileSend extends Thread {
     }
 
     //Handling receive & send of files
-    static boolean sendFile(File file, String fileLocation, boolean replication) throws Exception {
+    static boolean sendFile(File file, String fileLocation, boolean resending) throws Exception {
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
             try {
@@ -178,7 +178,7 @@ public class FileSend extends Thread {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if(replication){
+                    if(resending){
                         updateMessage(file.getName(), locationIP, false, "");
                         FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
                         file.delete(); //delete the file in replicated folder because we  sent it to the right owner
@@ -197,11 +197,11 @@ public class FileSend extends Thread {
         return false;
     }
 
-     static void updateMessage(String filename, String IP, boolean localOwner, String previousIP) throws IOException {
+     static void updateMessage(String filename, String locationIP, boolean localOwner, String previousIP) throws IOException {
         //tell owner of the file that we are moving the replicated file so he can keep track in his log
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + filename + "\""
-                + "," + "\"location\":" + "\"" + IP + "\"" + "}";
+                + "," + "\"location\":" + "\"" + locationIP + "\"" + "}";
         //System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
          //
         if(!localOwner) {
