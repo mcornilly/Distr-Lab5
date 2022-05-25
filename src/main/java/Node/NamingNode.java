@@ -99,7 +99,7 @@ public class NamingNode {
             name = args[0];
             time = Integer.parseInt(args[1]);
         } else {
-            System.out.println("Please give a name to your node!");
+            System.out.println("Please give a name and time to your node!");
             return;
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
