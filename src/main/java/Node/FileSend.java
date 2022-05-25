@@ -139,6 +139,7 @@ public class FileSend extends Thread {
                             System.out.println("    Filename:" + f.getName()); //print out the name
                             String fileLocation = this.node.getFile(f.getName()); //get the location where the file should be
                             sendFile(f, fileLocation, true, false, ""); //transfer = true if the files was sent
+                            f.delete(); //delete the file in replicated folder because we  sent it to the right owner
                         } catch (Exception e) {
                         }
                     }
@@ -179,9 +180,9 @@ public class FileSend extends Thread {
                         e.printStackTrace();
                     }
                     if(resending){
+                        //message
                         updateMessage(file.getName(), locationIP, localOwner, previousIP);
                         FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
-                        file.delete(); //delete the file in replicated folder because we  sent it to the right owner
                     }else{
                         sentFiles.put(file.getName(), locationIP);
                         System.out.println("    sentFiles log: " + sentFiles);

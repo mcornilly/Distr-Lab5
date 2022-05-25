@@ -145,8 +145,12 @@ public class FileReceive extends Thread{
         receivedFiles.put(filename, remoteIP);
         System.out.println("ReplicatedFiles: " + Arrays.toString(this.replicatedFiles));
         if(localFile[0].getName().equals(replicatedFile[0].getName())){
-            System.out.println("This is our local file, delete it");
+            System.out.println("This is our local file, delete it and send it to our previous node if possible");
             replicatedFile[0].delete();
+            if(this.discoveryNode.getPreviousID() != this.discoveryNode.getCurrentID()) {
+                FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + this.discoveryNode.getPreviousID() + "," +
+                        "\"node IP\":" + "\"" + this.discoveryNode.getPreviousIP() + "\"" + "}", true, true, this.discoveryNode.getPreviousIP()); //send the file to the prev neighbour
+            }
         }
     }
 
