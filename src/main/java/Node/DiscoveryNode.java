@@ -319,8 +319,8 @@ public class DiscoveryNode extends Thread {
                         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
                         File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter);
                         File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
-                        System.out.println("Localfiles at update: " + localFile);
-                        System.out.println("Replicatedfiles at update: " + replicatedFile);
+                        System.out.println("Localfiles at update: " + localFile[0].getName());
+                        System.out.println("Replicatedfiles at update: " + replicatedFile[0].getName());
                         if (location.equals(InetAddress.getLocalHost().getHostAddress()) && localFile != null && replicatedFile != null) { //If the location is ourselves, send the replicated file further if possible
                             FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + previousID + "," +
                                     "\"node IP\":" + "\"" + previousIP + "\"" + "}", true, true, previousIP); //send the file to the prev neighbour
