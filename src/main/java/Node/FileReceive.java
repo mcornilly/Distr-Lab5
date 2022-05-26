@@ -135,7 +135,7 @@ public class FileReceive extends Thread{
             fileOutputStream.write(buffer, 0, bytes);
             size -= bytes;      // read upto file size
         }
-        System.out.println("File received succesfully");
+        System.out.println("File " + filename + " received successfully");
         fileOutputStream.close();
         this.replicatedFiles = this.replicatedFolder.listFiles();
         FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);

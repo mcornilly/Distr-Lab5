@@ -270,6 +270,7 @@ public class FileSend extends Thread {
                 //Move replicated file to the previous node
                 sendFile(f, "{\"file\":" + "\"" + f.getName() + "\"" + "," + "\"node ID\":" + previousID + "," +
                         "\"node IP\":" + "\"" +  previousIP + "\"" +  "}", true, false, "");
+                f.delete();
             } catch (Exception e){
             }
         }
