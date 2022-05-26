@@ -328,7 +328,7 @@ public class DiscoveryNode extends Thread {
                            }
                        }
                        catch(Exception e){
-                           e.printStackTrace();
+                           //e.printStackTrace();
                            FileSend.updateMessage(filename, location, true, previousIP); //if we are not the local owner, forward the message
                            System.out.println("Forward update message");
                         }
