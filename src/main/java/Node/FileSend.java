@@ -151,7 +151,7 @@ public class FileSend extends Thread {
     }
 
     //Handling receive & send of files
-    static boolean sendFile(File file, String fileLocation, boolean resending, boolean localOwner, String previousIP) throws Exception {
+    static boolean sendFile(File file, String fileLocation, boolean resending, boolean forward, String previousIP) throws Exception {
         if (!fileLocation.equals("Error")) {
             JSONParser parser = new JSONParser();
             try {
@@ -181,7 +181,7 @@ public class FileSend extends Thread {
                     }
                     if(resending){
                         //message
-                        updateMessage(file.getName(), locationIP, localOwner, previousIP);
+                        updateMessage(file.getName(), locationIP, forward, previousIP);
                         FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
 
                     }else{
@@ -199,14 +199,14 @@ public class FileSend extends Thread {
         return false;
     }
 
-     static void updateMessage(String filename, String locationIP, boolean previousOwner, String previousIP) throws IOException {
+     static void updateMessage(String filename, String locationIP, boolean forward, String previousIP) throws IOException {
         //tell owner of the file that we are moving the replicated file so he can keep track in his log
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + filename + "\""
                 + "," + "\"location\":" + "\"" + locationIP + "\"" + "}";
         //System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
          //
-        if(!previousOwner) {
+        if(!forward) {
             DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(filename)), 8001);
             responseSocket.send(updateFile); //sent the packet
         }else{

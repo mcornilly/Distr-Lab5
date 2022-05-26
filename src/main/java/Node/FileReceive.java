@@ -148,8 +148,9 @@ public class FileReceive extends Thread{
             System.out.println("This is our local file, delete it and send it to our previous node if possible");
             if(this.discoveryNode.getPreviousID() != this.discoveryNode.getCurrentID()) {
                 FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + this.discoveryNode.getPreviousID() + "," +
-                        "\"node IP\":" + "\"" + this.discoveryNode.getPreviousIP() + "\"" + "}", true, true, this.discoveryNode.getPreviousIP()); //send the file to the prev neighbour
+                        "\"node IP\":" + "\"" + this.discoveryNode.getPreviousIP() + "\"" + "}", false, false, this.discoveryNode.getPreviousIP()); //send the file to the prev neighbour
             }
+            receivedFiles.remove(filename); //remove for our mapping because we are localowners ourselves
             FileSend.getSentFiles().replace(filename, this.discoveryNode.getPreviousIP());
             replicatedFile[0].delete();
         }
