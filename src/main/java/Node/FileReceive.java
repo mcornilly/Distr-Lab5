@@ -149,9 +149,11 @@ public class FileReceive extends Thread{
             if(this.discoveryNode.getPreviousID() != this.discoveryNode.getCurrentID()) {
                 FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + this.discoveryNode.getPreviousID() + "," +
                         "\"node IP\":" + "\"" + this.discoveryNode.getPreviousIP() + "\"" + "}", false, false, this.discoveryNode.getPreviousIP()); //send the file to the prev neighbour
+                FileSend.getSentFiles().replace(filename, this.discoveryNode.getPreviousIP());
+            }else{
+                FileSend.getSentFiles().remove(filename);
             }
             receivedFiles.remove(filename); //remove for our mapping because we are localowners ourselves
-            FileSend.getSentFiles().replace(filename, this.discoveryNode.getPreviousIP());
             replicatedFile[0].delete();
         }
     }
