@@ -15,11 +15,9 @@ public class ShutdownNode extends Thread{
     private final String previousIP;
     private final String nextIP;
     private final DatagramSocket shutdownSocket;
-    //private final FileManager fileManager;
 
     public ShutdownNode(NamingNode node) throws SocketException {
         this.node = node;
-        //this.fileManager = fileManager;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
@@ -33,7 +31,6 @@ public class ShutdownNode extends Thread{
     public void start(){
         try {
             System.out.println("Shutting down...");
-
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets
             String previousResponse;
             String nextResponse;
@@ -48,7 +45,6 @@ public class ShutdownNode extends Thread{
             this.node.discoveryNode.getFileSend().ShutdownFile(previousID, previousIP); //shutdown of files
             ShutdownFileMessage(); //message of shutdown to file owners
             NamingNode.setRunning(false);
-            //FileReceive.currentThread().interrupt();
             FileReceive.teardown();
             FileChecker.teardown();
 
