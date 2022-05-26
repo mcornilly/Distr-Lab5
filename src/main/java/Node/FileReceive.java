@@ -150,6 +150,7 @@ public class FileReceive extends Thread{
                 FileSend.sendFile(replicatedFile[0], "{\"file\":" + "\"" + filename + "\"" + "," + "\"node ID\":" + this.discoveryNode.getPreviousID() + "," +
                         "\"node IP\":" + "\"" + this.discoveryNode.getPreviousIP() + "\"" + "}", true, true, this.discoveryNode.getPreviousIP()); //send the file to the prev neighbour
             }
+            FileSend.getSentFiles().replace(filename, this.discoveryNode.getPreviousIP());
             replicatedFile[0].delete();
         }
     }

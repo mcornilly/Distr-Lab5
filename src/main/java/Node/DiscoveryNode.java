@@ -1,5 +1,6 @@
 package Node;
 
+import org.apache.tomcat.util.net.AprEndpoint;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -314,6 +315,24 @@ public class DiscoveryNode extends Thread {
                     if (!s1.equals(s2) && !receivePacket.getAddress().toString().equals("/127.0.0.1")) {
                         System.out.println("UpdateFile package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("    received data: " + receivedData);
+                        String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated
+                        String location = (String) ((JSONObject) obj).get("location"); //get the location where the new file is
+
+                        FilenameFilter filenameFilter = (files, s) -> s.startsWith(filename);
+                        File[] localFile = FileSend.getLocalFolder().listFiles(filenameFilter); //only get the affected file
+                        File[] replicatedFile = FileSend.getReplicatedFolder().listFiles(filenameFilter); //only get the affected file
+                       try {
+                           if (localFile[0].getName().equals(filename)) { //If we are the local owner
+                               FileSend.getSentFiles().replace(filename, location); //update our local mapping
+                               System.out.println("Update local mapping");
+                           }
+                       }
+                       catch(Exception e){
+                           e.printStackTrace();
+                           FileSend.updateMessage(filename, location, true, previousIP); //if we are not the local owner, forward the message
+                           System.out.println("Forward update message");
+                        }
+
                     }
                         /*
                         String filename = (String) ((JSONObject) obj).get("filename"); //get the filename that was updated

@@ -183,6 +183,7 @@ public class FileSend extends Thread {
                         //message
                         updateMessage(file.getName(), locationIP, localOwner, previousIP);
                         FileReceive.getReceivedFiles().remove(file.getName()); //remove from our receivedfiles map
+
                     }else{
                         sentFiles.put(file.getName(), locationIP);
                         System.out.println("    sentFiles log: " + sentFiles);
@@ -198,14 +199,14 @@ public class FileSend extends Thread {
         return false;
     }
 
-     static void updateMessage(String filename, String locationIP, boolean localOwner, String previousIP) throws IOException {
+     static void updateMessage(String filename, String locationIP, boolean previousOwner, String previousIP) throws IOException {
         //tell owner of the file that we are moving the replicated file so he can keep track in his log
         //sent message that the file is updated to the local owner
         String update = "{\"status\":\"UpdateFile\","  + "\"filename\":" + "\"" + filename + "\""
                 + "," + "\"location\":" + "\"" + locationIP + "\"" + "}";
         //System.out.println(FileReceive.getReceivedFiles().get(f.getName()));
          //
-        if(!localOwner) {
+        if(!previousOwner) {
             DatagramPacket updateFile = new DatagramPacket(update.getBytes(StandardCharsets.UTF_8), update.length(), InetAddress.getByName(FileReceive.getReceivedFiles().get(filename)), 8001);
             responseSocket.send(updateFile); //sent the packet
         }else{
