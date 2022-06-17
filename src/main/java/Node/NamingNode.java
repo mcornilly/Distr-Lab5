@@ -36,7 +36,7 @@ public class NamingNode {
             //String URL = "http://localhost:8080/NamingServer/getFile/" + filename; //REST command
             //System.out.println(discoveryNode.getServerIP());
             //String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Files/" + filename;
-            String URL = "http://" + "192.168.80.3" + ":8080/NamingServer/Files/" + filename;
+            String URL = "http://" + "172.21.0.6" + ":8080/NamingServer/Files/" + filename;
             System.out.println(Unirest.get(URL).asString().getBody());
             return Unirest.get(URL).asString().getBody();
         } catch (Exception e) {
@@ -104,8 +104,6 @@ public class NamingNode {
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
         new PingNode(node).start();
-        //FileManager fileManager = new FileManager(node);
-        //fileManager.start();
         Thread.sleep(time);
         new ShutdownNode(node).start(); // start shutdown in different Thread
         //node.newNode(name, IP);
